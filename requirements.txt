@@ -1,0 +1,9 @@
+Flask>=3.0.0
+Flask-CORS>=4.0.0
+requests>=2.31.0
+tldextract>=5.1.1
+python-whois>=0.8.0
+beautifulsoup4>=4.12.2
+python-dotenv>=1.0.1
+gunicorn>=21.2.0
+

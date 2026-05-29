@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+{% block title %}Documentación | PhishShield{% endblock %}
+{% block content %}
+    <main class="flex-grow container mx-auto px-4 py-12 max-w-6xl">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-4 text-blue-800">Documentación de PhishShield</h1>
+            <p class="text-gray-600 text-lg">Guía completa para entender y utilizar nuestra plataforma de análisis de seguridad</p>
+        </div>
+
+        <div class="grid md:grid-cols-4 gap-8">
+            <!-- Sidebar Navigation -->
+            <div class="md:col-span-1">
+                <nav class="sticky top-24 bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Contenidos</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#introduccion" class="text-blue-600 hover:text-blue-800 block py-1">📋 Introducción</a></li>
+                        <li><a href="#como-usar" class="text-blue-600 hover:text-blue-800 block py-1">🚀 Cómo Usar</a></li>
+                        <li><a href="#funcionamiento" class="text-blue-600 hover:text-blue-800 block py-1">🔧 Funcionamiento</a></li>
+                        <li><a href="#caracteristicas" class="text-blue-600 hover:text-blue-800 block py-1">⭐ Características</a></li>
+                        <li><a href="#api" class="text-blue-600 hover:text-blue-800 block py-1">🔌 API REST</a></li>
+                        <li><a href="#faq" class="text-blue-600 hover:text-blue-800 block py-1">❓ Preguntas Frecuentes</a></li>
+                        <li><a href="#soporte" class="text-blue-600 hover:text-blue-800 block py-1">🛟 Soporte</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="md:col-span-3 space-y-8">
+                <!-- Introducción -->
+                <section id="introduccion" class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-blue-500">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        ¿Qué es PhishShield?
+                    </h2>
+                    <div class="space-y-4 text-gray-700">
+                        <p><strong>PhishShield</strong> es una plataforma avanzada de análisis de URLs que combina <strong>inteligencia artificial</strong> con múltiples fuentes de threat intelligence para detectar sitios de phishing, malware y otras amenazas web en tiempo real.</p>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-blue-800 mb-2">🎯 Nuestro Propósito</h3>
+                            <ul class="list-disc ml-6 text-blue-700 space-y-1">
+                                <li>Proteger usuarios y organizaciones de amenazas web</li>
+                                <li>Proporcionar análisis precisos y en tiempo real</li>
+                                <li>Educar sobre prácticas seguras de navegación</li>
+                                <li>Contribuir a la investigación en ciberseguridad</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Cómo Usar -->
+                <section id="como-usar" class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-green-500">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Cómo Usar PhishShield
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div class="text-center p-4 bg-green-50 rounded-lg">
+                                <div class="text-2xl font-bold text-green-600 mb-2">1</div>
+                                <h3 class="font-semibold text-green-800 mb-2">Ingresa la URL</h3>
+                                <p class="text-green-700 text-sm">Escribe o pega la URL que quieres analizar en la barra principal de búsqueda</p>
+                            </div>
+                            <div class="text-center p-4 bg-blue-50 rounded-lg">
+                                <div class="text-2xl font-bold text-blue-600 mb-2">2</div>
+                                <h3 class="font-semibold text-blue-800 mb-2">Inicia el Análisis</h3>
+                                <p class="text-blue-700 text-sm">Haz clic en "Analizar" para comenzar el escaneo con múltiples motores</p>
+                            </div>
+                            <div class="text-center p-4 bg-purple-50 rounded-lg">
+                                <div class="text-2xl font-bold text-purple-600 mb-2">3</div>
+                                <h3 class="font-semibold text-purple-800 mb-2">Revisa Resultados</h3>
+                                <p class="text-purple-700 text-sm">Analiza el reporte detallado con puntuación de riesgo y recomendaciones</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-yellow-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-yellow-800 mb-2">💡 Consejos para un Mejor Uso</h3>
+                            <ul class="list-disc ml-6 text-yellow-700 space-y-1">
+                                <li>Siempre copia la URL completa incluyendo "https://" o "http://"</li>
+                                <li>Revisa el historial de análisis para URLs previamente escaneadas</li>
+                                <li>Utiliza las estadísticas para identificar patrones de amenazas</li>
+                                <li>Consulta la documentación de la API para integraciones</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Funcionamiento -->
+                <section id="funcionamiento" class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-purple-500">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                        </svg>
+                        Cómo Funciona PhishShield
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-purple-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-purple-800 mb-2">🛡️ Múltiples Capas de Análisis</h3>
+                                <ul class="list-disc ml-6 text-purple-700 space-y-2">
+                                    <li><strong>PhishTank:</strong> Base de datos colaborativa de phishing</li>
+                                    <li><strong>VirusTotal:</strong> 70+ motores antivirus simultáneos</li>
+                                    <li><strong>Análisis Heurístico:</strong> IA con 12 características de URLs</li>
+                                    <li><strong>WHOIS:</strong> Verificación de edad y registro de dominios</li>
+                                </ul>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-blue-800 mb-2">🧠 Inteligencia Artificial</h3>
+                                <ul class="list-disc ml-6 text-blue-700 space-y-2">
+                                    <li><strong>Algoritmo de ML:</strong> Sistema de ponderación inteligente</li>
+                                    <li><strong>Características:</strong> 12 parámetros técnicos analizados</li>
+                                    <li><strong>Scoring:</strong> Puntuación de riesgo 0-10</li>
+                                    <li><strong>Explicabilidad:</strong> Razones detalladas de cada detección</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-gray-800 mb-2">⚙️ Proceso Técnico Detallado</h3>
+                            <ol class="list-decimal ml-6 text-gray-700 space-y-2">
+                                <li><strong>Validación de URL:</strong> Verificación de formato y estructura</li>
+                                <li><strong>Consulta a APIs:</strong> PhishTank y VirusTotal en paralelo</li>
+                                <li><strong>Extracción de características:</strong> 12 parámetros técnicos</li>
+                                <li><strong>Análisis heurístico:</strong> Cálculo de puntuación de riesgo</li>
+                                <li><strong>Almacenamiento:</strong> Base de datos normalizada (4NF)</li>
+                                <li><strong>Reporte:</strong> Resultados consolidados y explicados</li>
+                            </ol>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Características -->
+                <section id="caracteristicas" class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-yellow-500">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                        </svg>
+                        Características Principales
+                    </h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div class="bg-yellow-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-yellow-800 mb-2">🔍 Análisis Completo</h3>
+                                <ul class="list-disc ml-6 text-yellow-700 space-y-1">
+                                    <li>Detección multi-motor en tiempo real</li>
+                                    <li>Análisis heurístico con IA</li>
+                                    <li>Verificación WHOIS de dominios</li>
+                                    <li>Puntuación de riesgo 0-10</li>
+                                </ul>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-green-800 mb-2">💾 Base de Datos Avanzada</h3>
+                                <ul class="list-disc ml-6 text-green-700 space-y-1">
+                                    <li>Estructura normalizada (4NF)</li>
+                                    <li>Evita duplicados (24h cache)</li>
+                                    <li>Historial completo de análisis</li>
+                                    <li>Estadísticas detalladas</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-blue-800 mb-2">🚀 Rendimiento</h3>
+                                <ul class="list-disc ml-6 text-blue-700 space-y-1">
+                                    <li>Análisis en menos de 10 segundos</li>
+                                    <li>APIs consultadas en paralelo</li>
+                                    <li>Cache inteligente de resultados</li>
+                                    <li>Interfaz responsive y rápida</li>
+                                </ul>
+                            </div>
+                            <div class="bg-purple-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-purple-800 mb-2">🛡️ Seguridad</h3>
+                                <ul class="list-disc ml-6 text-purple-700 space-y-1">
+                                    <li>Comunicación HTTPS</li>
+                                    <li>Validación estricta de entradas</li>
+                                    <li>Protección CORS configurada</li>
+                                    <li>Headers de seguridad</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- API -->
+                <section id="api" class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-red-500">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        API REST
+                    </h2>
+                    <div class="space-y-4">
+                        <p class="text-gray-700">PhishShield ofrece una API REST completa para integraciones automáticas. Consulta nuestra <a href="/api-rest" class="text-blue-600 hover:text-blue-800 underline">documentación completa de la API</a> para más detalles.</p>
+                        
+                        <div class="bg-red-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-red-800 mb-2">🔗 Endpoints Principales</h3>
+                            <div class="space-y-3">
+                                <div class="bg-white p-3 rounded border">
+                                    <code class="text-sm bg-gray-100 px-2 py-1 rounded">POST /analyze</code>
+                                    <span class="text-gray-600 ml-2">- Analizar una URL</span>
+                                </div>
+                                <div class="bg-white p-3 rounded border">
+                                    <code class="text-sm bg-gray-100 px-2 py-1 rounded">GET /api/stats</code>
+                                    <span class="text-gray-600 ml-2">- Obtener estadísticas</span>
+                                </div>
+                                <div class="bg-white p-3 rounded border">
+                                    <code class="text-sm bg-gray-100 px-2 py-1 rounded">GET /api/urls</code>
+                                    <span class="text-gray-600 ml-2">- Listar URLs analizadas</span>
+                                </div>
+                                <div class="bg-white p-3 rounded border">
+                                    <code class="text-sm bg-gray-100 px-2 py-1 rounded">POST /api/url-history</code>
+                                    <span class="text-gray-600 ml-2">- Historial de una URL</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- FAQ -->
+                <section id="faq" class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-teal-500">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Preguntas Frecuentes
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="bg-teal-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-teal-800">¿PhishShield garantiza el 100% de detección?</h3>
+                            <p class="text-teal-700 mt-1">No, ninguna herramienta puede garantizar el 100% de detección. PhishShield combina múltiples fuentes y IA para maximizar la precisión, pero recomendamos usarlo como una capa más de seguridad.</p>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-blue-800">¿Qué hace diferente a PhishShield?</h3>
+                            <p class="text-blue-700 mt-1">Combinamos APIs externas con nuestro propio algoritmo de IA heurística, base de datos normalizada y sistema explicable que muestra las razones detrás de cada detección.</p>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-purple-800">¿Es gratuito el servicio?</h3>
+                            <p class="text-purple-700 mt-1">Sí, PhishShield es completamente gratuito para uso personal. Para uso empresarial o integraciones avanzadas, contáctanos para conocer nuestras opciones.</p>
+                        </div>
+                        <div class="bg-yellow-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-yellow-800">¿Cómo manejan mi privacidad?</h3>
+                            <p class="text-yellow-700 mt-1">No recopilamos información personal. Las URLs se hashean y almacenan de forma anónima. Consulta nuestra <a href="/privacy" class="underline">Política de Privacidad</a> para más detalles.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Soporte -->
+                <section id="soporte" class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-indigo-500">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Soporte y Contacto
+                    </h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-indigo-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-indigo-800 mb-2">📞 Canales de Soporte</h3>
+                            <ul class="list-disc ml-6 text-indigo-700 space-y-2">
+                                <li><strong>Soporte Técnico:</strong> soporte@phishshield.com</li>
+                                <li><strong>Consultas API:</strong> api@phishshield.com</li>
+                                <li><strong>Asuntos de Seguridad:</strong> security@phishshield.com</li>
+                                <li><strong>Privacidad y GDPR:</strong> privacy@phishshield.com</li>
+                            </ul>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-green-800 mb-2">🕒 Tiempos de Respuesta</h3>
+                            <ul class="list-disc ml-6 text-green-700 space-y-2">
+                                <li><strong>Soporte general:</strong> 24-48 horas</li>
+                                <li><strong>Incidentes de seguridad:</strong> 12-24 horas</li>
+                                <li><strong>Solicitudes GDPR:</strong> Máximo 30 días</li>
+                                <li><strong>Consultas API:</strong> 48-72 horas</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-6 text-center bg-blue-50 p-4 rounded-lg">
+                        <p class="text-blue-700">¿Necesitas ayuda inmediata? Revisa nuestra <a href="/blog" class="font-semibold underline">sección de blog</a> para tutoriales y mejores prácticas.</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Smooth scroll for navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('a[href^="#"]');
+            
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

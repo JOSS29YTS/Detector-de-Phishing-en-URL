@@ -1,0 +1,428 @@
+{% extends 'base.html' %}
+{% block title %}API REST | PhishShield{% endblock %}
+{% block content %}
+    <main class="flex-grow container mx-auto px-4 py-12 max-w-6xl">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-4 text-blue-800">API REST de PhishShield</h1>
+            <p class="text-gray-600 text-lg">Documentación completa para integrar nuestro servicio de análisis de seguridad en tus aplicaciones</p>
+        </div>
+
+        <div class="grid md:grid-cols-4 gap-8">
+            <!-- Sidebar Navigation -->
+            <div class="md:col-span-1">
+                <nav class="sticky top-24 bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Endpoints</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#introduccion" class="text-blue-600 hover:text-blue-800 block py-1">📋 Introducción</a></li>
+                        <li><a href="#autenticacion" class="text-blue-600 hover:text-blue-800 block py-1">🔑 Autenticación</a></li>
+                        <li><a href="#analyze" class="text-blue-600 hover:text-blue-800 block py-1">🔍 POST /analyze</a></li>
+                        <li><a href="#virustotal" class="text-blue-600 hover:text-blue-800 block py-1">🛡️ POST /virustotal-data</a></li>
+                        <li><a href="#stats" class="text-blue-600 hover:text-blue-800 block py-1">📊 GET /api/stats</a></li>
+                        <li><a href="#urls" class="text-blue-600 hover:text-blue-800 block py-1">📝 GET /api/urls</a></li>
+                        <li><a href="#url-history" class="text-blue-600 hover:text-blue-800 block py-1">🕐 POST /api/url-history</a></li>
+                        <li><a href="#ejemplos" class="text-blue-600 hover:text-blue-800 block py-1">💻 Ejemplos</a></li>
+                        <li><a href="#errores" class="text-blue-600 hover:text-blue-800 block py-1">❌ Códigos de Error</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="md:col-span-3 space-y-8">
+                <!-- Introducción -->
+                <section id="introduccion" class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-blue-500">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Introducción
+                    </h2>
+                    <div class="space-y-4 text-gray-700">
+                        <p>La API REST de PhishShield te permite integrar nuestro sistema de análisis de URLs en tus aplicaciones. Todos los endpoints devuelven respuestas en formato JSON y utilizan métodos HTTP estándar.</p>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-blue-800 mb-2">🚀 Características de la API</h3>
+                            <ul class="list-disc ml-6 text-blue-700 space-y-1">
+                                <li><strong>Respuestas JSON</strong> estructuradas y consistentes</li>
+                                <li><strong>Múltiples motores</strong> de análisis (PhishTank, VirusTotal, IA heurística)</li>
+                                <li><strong>Base de datos normalizada</strong> con cache inteligente</li>
+                                <li><strong>Estadísticas completas</strong> y historial de análisis</li>
+                                <li><strong>Sin autenticación requerida</strong> para uso básico</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Autenticación -->
+                <section id="autenticacion" class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-green-500">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        Autenticación
+                    </h2>
+                    <div class="space-y-4">
+                        <p class="text-gray-700">Actualmente la API es de acceso público y no requiere autenticación. Para uso empresarial o altos volúmenes de requests, contáctanos para obtener una API key.</p>
+                        
+                        <div class="bg-yellow-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-yellow-800 mb-2">⚠️ Límites de Uso</h3>
+                            <ul class="list-disc ml-6 text-yellow-700 space-y-1">
+                                <li><strong>Máximo 100 requests por hora</strong> por IP</li>
+                                <li><strong>Cache de 24 horas</strong> para URLs repetidas</li>
+                                <li><strong>Timeout de 30 segundos</strong> por análisis</li>
+                                <li>Uso comercial requiere licencia</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- POST /analyze -->
+                <section id="analyze" class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-purple-500">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        POST /analyze
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-purple-800 mb-2">📨 Request</h3>
+                            <div class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto">
+                                <code class="text-sm">
+                                    POST /analyze<br>
+                                    Content-Type: application/json<br><br>
+                                    {<br>
+                                    &nbsp;&nbsp;"url": "https://ejemplo.com/path"<br>
+                                    }
+                                </code>
+                            </div>
+                        </div>
+
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-green-800 mb-2">📬 Response (200 OK)</h3>
+                            <div class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto">
+                                <code class="text-sm">
+                                    {<br>
+                                    &nbsp;&nbsp;"url": "https://ejemplo.com",<br>
+                                    &nbsp;&nbsp;"is_malicious": false,<br>
+                                    &nbsp;&nbsp;"risk_score": 3,<br>
+                                    &nbsp;&nbsp;"phish_result": false,<br>
+                                    &nbsp;&nbsp;"virustotal_result": false,<br>
+                                    &nbsp;&nbsp;"features": {<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;"length": 45,<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;"domain_age": 365,<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;"is_https": true,<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;"has_ip": false<br>
+                                    &nbsp;&nbsp;},<br>
+                                    &nbsp;&nbsp;"domain_age": 365,<br>
+                                    &nbsp;&nbsp;"heuristic_reasons": ["URL muy larga"]<br>
+                                    }
+                                </code>
+                            </div>
+                        </div>
+
+                        <div class="bg-red-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-red-800 mb-2">❌ Response (400 Bad Request)</h3>
+                            <div class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto">
+                                <code class="text-sm">
+                                    {<br>
+                                    &nbsp;&nbsp;"error": "URL no proporcionada"<br>
+                                    }
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- POST /virustotal-data -->
+                <section id="virustotal" class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-yellow-500">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                        </svg>
+                        POST /virustotal-data
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="bg-yellow-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-yellow-800 mb-2">📨 Request</h3>
+                            <div class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto">
+                                <code class="text-sm">
+                                    POST /virustotal-data<br>
+                                    Content-Type: application/json<br><br>
+                                    {<br>
+                                    &nbsp;&nbsp;"url": "https://ejemplo.com"<br>
+                                    }
+                                </code>
+                            </div>
+                        </div>
+
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-green-800 mb-2">📬 Response (200 OK)</h3>
+                            <div class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto">
+                                <code class="text-sm">
+                                    {<br>
+                                    &nbsp;&nbsp;"malicious": 2,<br>
+                                    &nbsp;&nbsp;"suspicious": 1,<br>
+                                    &nbsp;&nbsp;"undetected": 5,<br>
+                                    &nbsp;&nbsp;"harmless": 58,<br>
+                                    &nbsp;&nbsp;"timeout": 0,<br>
+                                    &nbsp;&nbsp;"total": 66,<br>
+                                    &nbsp;&nbsp;"clean": 58,<br>
+                                    &nbsp;&nbsp;"engine_results": [<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;{<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"engine": "Google Safebrowsing",<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"category": "malicious",<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"result": "malicious",<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"method": "blacklist"<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                                    &nbsp;&nbsp;],<br>
+                                    &nbsp;&nbsp;"last_updated": "2024-01-15T10:30:00Z",<br>
+                                    &nbsp;&nbsp;"reputation": 0<br>
+                                    }
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- GET /api/stats -->
+                <section id="stats" class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-blue-500">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        GET /api/stats
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-blue-800 mb-2">📨 Request</h3>
+                            <div class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto">
+                                <code class="text-sm">
+                                    GET /api/stats
+                                </code>
+                            </div>
+                        </div>
+
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-green-800 mb-2">📬 Response (200 OK)</h3>
+                            <div class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto">
+                                <code class="text-sm">
+                                    {<br>
+                                    &nbsp;&nbsp;"total_unique_urls": 1250,<br>
+                                    &nbsp;&nbsp;"total_analyses": 3450,<br>
+                                    &nbsp;&nbsp;"ever_malicious_urls": 89,<br>
+                                    &nbsp;&nbsp;"malicious_analyses": 156,<br>
+                                    &nbsp;&nbsp;"avg_risk": 2.8,<br>
+                                    &nbsp;&nbsp;"risk_distribution": [650, 320, 180, 100],<br>
+                                    &nbsp;&nbsp;"source_detections": [45, 111]<br>
+                                    }
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- GET /api/urls -->
+                <section id="urls" class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-green-500">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-5 0-9-4-9-9s4-9 9-9"/>
+                        </svg>
+                        GET /api/urls
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-green-800 mb-2">📨 Request</h3>
+                            <div class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto">
+                                <code class="text-sm">
+                                    GET /api/urls
+                                </code>
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-blue-800 mb-2">📬 Response (200 OK)</h3>
+                            <div class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto">
+                                <code class="text-sm">
+                                    {<br>
+                                    &nbsp;&nbsp;"urls": [<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;{<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"url": "https://ejemplo.com",<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"domain": "ejemplo.com",<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"analysis_date": "2024-01-15 10:30:00",<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"risk_score": 3,<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"is_malicious": false,<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"detection_engine": "Heurístico"<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                                    &nbsp;&nbsp;]<br>
+                                    }
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- POST /api/url-history -->
+                <section id="url-history" class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-purple-500">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        POST /api/url-history
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-purple-800 mb-2">📨 Request</h3>
+                            <div class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto">
+                                <code class="text-sm">
+                                    POST /api/url-history<br>
+                                    Content-Type: application/json<br><br>
+                                    {<br>
+                                    &nbsp;&nbsp;"url": "https://ejemplo.com"<br>
+                                    }
+                                </code>
+                            </div>
+                        </div>
+
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-green-800 mb-2">📬 Response (200 OK)</h3>
+                            <div class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto">
+                                <code class="text-sm">
+                                    {<br>
+                                    &nbsp;&nbsp;"url": "https://ejemplo.com",<br>
+                                    &nbsp;&nbsp;"history": [<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;{<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"analysis_date": "2024-01-15 10:30:00",<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"is_malicious": false,<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"risk_score": 3,<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"results": "PhishTank: 0, VirusTotal: 0, Heuristic: 1"<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                                    &nbsp;&nbsp;]<br>
+                                    }
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Ejemplos -->
+                <section id="ejemplos" class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-yellow-500">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                        </svg>
+                        Ejemplos de Uso
+                    </h2>
+                    <div class="space-y-6">
+                        <div class="bg-yellow-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-yellow-800 mb-2">🐍 Python</h3>
+                            <div class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto">
+                                <code class="text-sm">
+                                    import requests<br><br>
+                                    response = requests.post(<br>
+                                    &nbsp;&nbsp;"http://localhost:5000/analyze",<br>
+                                    &nbsp;&nbsp;json={"url": "https://ejemplo.com"}<br>
+                                    )<br>
+                                    data = response.json()<br>
+                                    print(f"Riesgo: {data['risk_score']}/10")<br>
+                                    print(f"Malicioso: {data['is_malicious']}")
+                                </code>
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-blue-800 mb-2">🟨 JavaScript</h3>
+                            <div class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto">
+                                <code class="text-sm">
+                                    fetch('http://localhost:5000/analyze', {<br>
+                                    &nbsp;&nbsp;method: 'POST',<br>
+                                    &nbsp;&nbsp;headers: { 'Content-Type': 'application/json' },<br>
+                                    &nbsp;&nbsp;body: JSON.stringify({ url: 'https://ejemplo.com' })<br>
+                                    })<br>
+                                    .then(response => response.json())<br>
+                                    .then(data => {<br>
+                                    &nbsp;&nbsp;console.log(`Riesgo: ${data.risk_score}/10`);<br>
+                                    &nbsp;&nbsp;console.log(`Malicioso: ${data.is_malicious}`);<br>
+                                    });
+                                </code>
+                            </div>
+                        </div>
+
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-green-800 mb-2">🔗 cURL</h3>
+                            <div class="bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto">
+                                <code class="text-sm">
+                                    curl -X POST http://localhost:5000/analyze \<br>
+                                    &nbsp;&nbsp;-H "Content-Type: application/json" \<br>
+                                    &nbsp;&nbsp;-d '{"url": "https://ejemplo.com"}'
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Códigos de Error -->
+                <section id="errores" class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-red-500">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                        </svg>
+                        Códigos de Error
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-red-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-red-800 mb-2">4xx - Errores del Cliente</h3>
+                                <ul class="list-disc ml-6 text-red-700 space-y-1">
+                                    <li><strong>400</strong> - Bad Request (URL inválida o faltante)</li>
+                                    <li><strong>404</strong> - Not Found (Endpoint no existe)</li>
+                                    <li><strong>429</strong> - Too Many Requests (Límite excedido)</li>
+                                </ul>
+                            </div>
+                            <div class="bg-yellow-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-yellow-800 mb-2">5xx - Errores del Servidor</h3>
+                                <ul class="list-disc ml-6 text-yellow-700 space-y-1">
+                                    <li><strong>500</strong> - Internal Server Error</li>
+                                    <li><strong>502</strong> - Bad Gateway (APIs externas no disponibles)</li>
+                                    <li><strong>504</strong> - Gateway Timeout</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h3 class="font-semibold text-blue-800 mb-2">💡 Notas Importantes</h3>
+                            <ul class="list-disc ml-6 text-blue-700 space-y-2">
+                                <li>El endpoint <strong>/analyze</strong> puede tardar 5-15 segundos dependiendo de las APIs externas</li>
+                                <li>Los resultados se cachean por 24 horas para URLs repetidas</li>
+                                <li>Todas las respuestas incluyen timestamps y metadatos de análisis</li>
+                                <li>Para uso en producción, considera implementar retries y timeouts</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Smooth scroll for navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('a[href^="#"]');
+            
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

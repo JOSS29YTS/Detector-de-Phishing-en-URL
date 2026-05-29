@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% block title %}Cumplimiento GDPR | PhishShield{% endblock %}
+{% block content %}
+    <main class="flex-grow container mx-auto px-4 py-12 max-w-4xl">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-4 text-blue-800">Cumplimiento GDPR</h1>
+            <p class="text-gray-600 text-lg">En PhishShield nos regimos por el Reglamento General de Protección de Datos (GDPR) de la Unión Europea. Última actualización: <span id="current-date"></span></p>
+        </div>
+
+        <div class="space-y-8">
+            <!-- Sección 1 -->
+            <section class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-blue-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    Nuestro Compromiso con el GDPR
+                </h2>
+                <p class="text-gray-700 mb-4">PhishShield cumple plenamente con el Reglamento General de Protección de Datos (GDPR) de la Unión Europea. Creemos en la transparencia, privacidad y control sobre los datos personales :cite[7].</p>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-blue-800 mb-2">🛡️ Base Legal del Procesamiento</h3>
+                    <ul class="list-disc ml-6 text-blue-700 space-y-1">
+                        <li>Procesamos datos bajo el principio de <strong>interés legítimo</strong> para proporcionar servicios de análisis de seguridad</li>
+                        <li>Cumplimos con los <strong>principios de protección de datos</strong> del Artículo 5 del GDPR :cite[7]</li>
+                        <li>Implementamos <strong>medidas técnicas y organizativas</strong> apropiadas para garantizar la seguridad</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Sección 2 -->
+            <section class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-green-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                    </svg>
+                    Datos que Recopilamos y Por Qué
+                </h2>
+                <div class="space-y-4">
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-green-800 mb-2">📊 Datos para el Servicio Esencial</h3>
+                        <ul class="list-disc ml-6 text-green-700 space-y-1">
+                            <li><strong>URLs analizadas</strong> - Necesarias para el análisis de seguridad</li>
+                            <li><strong>Resultados del análisis</strong> - Para proporcionar el servicio contratado</li>
+                            <li><strong>Metadatos técnicos</strong> - Dominio, protocolo, puntuación de riesgo</li>
+                            <li><strong>Características de la URL</strong> - Para el algoritmo heurístico de IA</li>
+                        </ul>
+                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-yellow-800 mb-2">🚫 Lo que NO Recopilamos</h3>
+                        <ul class="list-disc ml-6 text-yellow-700 space-y-1">
+                            <li>Información de identificación personal (nombre, email, etc.)</li>
+                            <li>Direcciones IP (las anonimizamos)</li>
+                            <li>Datos de navegación o cookies de seguimiento</li>
+                            <li>Contenido de las páginas web analizadas</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 3 -->
+            <section class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-purple-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9m0 0v12m0 0h6m-6 0h6"/>
+                    </svg>
+                    Tus Derechos bajo el GDPR
+                </h2>
+                <p class="text-gray-700 mb-4">Como titular de datos, tienes derechos específicos bajo el GDPR. En PhishShield, respetamos y facilitamos el ejercicio de estos derechos :cite[2]:cite[7]:</p>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-purple-800 mb-2">📋 Derechos Principales</h3>
+                        <ul class="list-disc ml-6 text-purple-700 space-y-2">
+                            <li><strong>Derecho de acceso</strong> - A solicitar copia de tus datos analíticos</li>
+                            <li><strong>Derecho de rectificación</strong> - A corregir datos inexactos</li>
+                            <li><strong>Derecho de supresión</strong> - A eliminar tus datos analíticos</li>
+                            <li><strong>Derecho a la limitación del tratamiento</strong> - A restringir el procesamiento</li>
+                            <li><strong>Derecho de oposición</strong> - A oponerte al procesamiento</li>
+                            <li><strong>Derecho a la portabilidad</strong> - A recibir tus datos en formato estructurado</li>
+                        </ul>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-blue-800 mb-2">🔄 Cómo Ejercer Tus Derechos</h3>
+                        <ul class="list-disc ml-6 text-blue-700 space-y-2">
+                            <li>Contacta a nuestro Delegado de Protección de Datos</li>
+                            <li>Proporciona la URL específica que quieres gestionar</li>
+                            <li>Responderemos en un plazo máximo de <strong>30 días</strong></li>
+                            <li>Servicio completamente <strong>gratuito</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 4 -->
+            <section class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-red-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    Seguridad y Almacenamiento de Datos
+                </h2>
+                <div class="space-y-4 text-gray-700">
+                    <div class="bg-red-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-red-800 mb-2">🔐 Medidas de Seguridad Implementadas</h4>
+                        <ul class="list-disc ml-6 text-red-700 space-y-2">
+                            <li><strong>Base de datos normalizada (4NF)</strong> con información separada</li>
+                            <li><strong>Hashing de URLs</strong> con MD5 para protección adicional</li>
+                            <li><strong>Eliminación automática</strong> de datos antiguos</li>
+                            <li><strong>Acceso restringido</strong> solo a personal autorizado</li>
+                            <li><strong>Comunicaciones seguras</strong> con HTTPS obligatorio :cite[1]</li>
+                        </ul>
+                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-yellow-800 mb-2">⏱️ Períodos de Retención</h4>
+                        <p class="text-yellow-700"><strong>Los datos de análisis se conservan por máximo 12 meses</strong> para fines de investigación y mejora del servicio, después se eliminan automáticamente de nuestros sistemas.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 5 -->
+            <section class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-teal-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/>
+                    </svg>
+                    Transferencias Internacionales
+                </h2>
+                <div class="space-y-4 text-gray-700">
+                    <p>PhishShield opera servidores en la Unión Europea y no transferimos datos personales a terceros países sin las garantías adecuadas. Utilizamos proveedores que cumplen con las cláusulas estándar de protección de datos de la UE.</p>
+                    <div class="bg-teal-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-teal-800 mb-2">🌍 Nuestro Enfoque de Localización de Datos</h4>
+                        <ul class="list-disc ml-6 text-teal-700 space-y-2">
+                            <li>Servidores localizados en la Unión Europea</li>
+                            <li>Proveedores que cumplen con las cláusulas estándar de protección de datos</li>
+                            <li>No compartimos datos con terceros sin consentimiento explícito</li>
+                            <li>Garantías contractuales con todos nuestros proveedores</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 6 -->
+            <section class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-indigo-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Cumplimiento y Responsabilidad
+                </h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-indigo-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-indigo-800 mb-2">📝 Documentación y Transparencia</h3>
+                        <ul class="list-disc ml-6 text-indigo-700 space-y-2">
+                            <li>Mantenemos registros detallados de actividades de tratamiento</li>
+                            <li>Documentamos las bases legales para cada tipo de procesamiento</li>
+                            <li>Realizamos evaluaciones de impacto de protección de datos</li>
+                            <li>Revisamos y actualizamos nuestras políticas regularmente</li>
+                        </ul>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-green-800 mb-2">🛡️ Notificación de Incidencias</h3>
+                        <ul class="list-disc ml-6 text-green-700 space-y-2">
+                            <li>Procedimientos documentados para brechas de seguridad</li>
+                            <li>Notificación a autoridades en <strong>72 horas</strong> si es requerido</li>
+                            <li>Comunicación transparente con los afectados</li>
+                            <li>Medidas proactivas de prevención y mitigación</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contacto -->
+            <section class="bg-blue-50 rounded-xl p-6 text-center">
+                <h3 class="text-xl font-semibold text-blue-800 mb-2">¿Preguntas sobre GDPR o Derechos de Privacidad?</h3>
+                <p class="text-blue-700 mb-4">Contáctanos en <a href="mailto:privacy@phishshield.com" class="font-semibold underline">privacy@phishshield.com</a></p>
+                <div class="flex flex-wrap justify-center gap-4 text-sm text-blue-600">
+                    <span class="bg-white px-3 py-1 rounded-full">📧 Respuesta en 48 horas</span>
+                    <span class="bg-white px-3 py-1 rounded-full">🕐 Plazo máximo: 30 días para solicitudes</span>
+                    <span class="bg-white px-3 py-1 rounded-full">🔒 Servicio confidencial y gratuito</span>
+                </div>
+                <p class="text-blue-600 text-sm mt-4">También tienes derecho a presentar una reclamación ante la autoridad de control de protección de datos de tu país.</p>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // JavaScript para mostrar la fecha actual
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const formattedDate = today.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            document.getElementById('current-date').textContent = formattedDate;
+        });
+    </script>
+{% endblock %}

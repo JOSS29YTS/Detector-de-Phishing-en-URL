@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PhishShield{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%);
+        }
+        .nav-link {
+            font-size: 1.125rem;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        @media (max-width: 768px) {
+            .nav-link {
+                font-size: 1rem;
+                padding: 0.4rem 1rem;
+            }
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                <i data-feather="shield" class="w-8 h-8"></i>
+                <span class="text-xl font-bold">PhishShield</span>
+            </div>
+            <div class="flex space-x-2 md:space-x-4 justify-center w-full md:w-auto">
+                <a href="/" class="nav-link text-center {% if request.path == '/' %}bg-blue-700 bg-opacity-50{% endif %}">Inicio</a>
+                <a href="/stats" class="nav-link text-center {% if request.path == '/stats' %}bg-blue-700 bg-opacity-50{% endif %}">Estadísticas</a>
+            </div>
+            <div class="hidden md:flex items-center">
+                <div class="w-12"></div>
+            </div>
+        </div>
+    </nav>
+    {% block content %}{% endblock %}
+    <footer class="bg-gray-900 text-white py-12 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i data-feather="shield" class="w-8 h-8 text-blue-400"></i>
+                        <span class="text-xl font-bold">PhishShield</span>
+                    </div>
+                    <p class="text-gray-400">
+                        Solución avanzada de detección de phishing con inteligencia artificial y múltiples fuentes de seguridad.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Enlaces</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/docs" class="text-gray-400 hover:text-white transition">Documentación</a></li>
+                        <li><a href="/api-rest" class="text-gray-400 hover:text-white transition">API REST</a></li>
+                        <li><a href="/stats" class="text-gray-400 hover:text-white transition">Estadísticas</a></li>
+                        <li><a href="/blog" class="text-gray-400 hover:text-white transition">Blog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/terms" class="text-gray-400 hover:text-white transition">Términos</a></li>
+                        <li><a href="/privacy" class="text-gray-400 hover:text-white transition">Privacidad</a></li>
+                        <li><a href="/security" class="text-gray-400 hover:text-white transition">Seguridad</a></li>
+                        <li><a href="/gdpr" class="text-gray-400 hover:text-white transition">GDPR</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contacto</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center space-x-2 text-gray-400">
+                            <i data-feather="mail" class="w-4 h-4"></i>
+                            <span>soporte@phishshield.com</span>
+                        </li>
+                        <li class="flex items-center space-x-2 text-gray-400">
+                            <i data-feather="twitter" class="w-4 h-4"></i>
+                            <span>@phishshield</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500 text-sm">
+                <p>© 2023 PhishShield. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+    <script>
+        AOS.init({ duration: 800, easing: 'ease-in-out', once: true });
+        feather.replace();
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

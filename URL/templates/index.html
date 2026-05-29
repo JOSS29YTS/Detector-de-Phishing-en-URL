@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishShield - Detector de Phishing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%);
+        }
+        .risk-low { border-color: #10b981; }
+        .risk-medium { border-color: #f59e0b; }
+        .risk-high { border-color: #ef4444; }
+        .risk-critical { border-color: #7c3aed; }
+        
+        .loader {
+            border-top-color: #3b82f6;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result-section {
+            display: none;
+        }
+        
+        .nav-link {
+            font-size: 1.125rem;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .nav-link {
+                font-size: 1rem;
+                padding: 0.4rem 1rem;
+            }
+        }
+
+        .loader {
+            border-top-color: #3b82f6;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Nuevos estilos para la sección de carga */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 20px auto;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            animation: progressAnimation 2.5s infinite;
+        }
+        
+        @keyframes progressAnimation {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+        
+        .checkmark {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: block;
+            stroke-width: 3;
+            stroke: #ffffff;
+            stroke-miterlimit: 10;
+            margin: 0 auto;
+            opacity: 0;
+        }
+        
+        .checkmark-circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 3;
+            stroke-miterlimit: 10;
+            stroke: #10b981;
+            fill: none;
+        }
+        
+        .checkmark-check {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+        }
+        
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        
+        .step-item:not(:last-child):before {
+            content: "";
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            height: 2px;
+            width: 100%;
+            background-color: #e5e7eb;
+        }
+        
+        .step-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e5e7eb;
+            color: #6b7280;
+            position: relative;
+            z-index: 10;
+            margin-bottom: 8px;
+        }
+        
+        .step-icon.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .step-icon.completed {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .step-text {
+            font-size: 0.75rem;
+            color: #6b7280;
+            text-align: center;
+            max-width: 100px;
+        }
+        
+        .step-text.active {
+            color: #3b82f6;
+            font-weight: 500;
+        }
+        
+        .step-text.completed {
+            color: #10b981;
+        }
+        
+        .result-section {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar -->
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                <i data-feather="shield" class="w-8 h-8"></i>
+                <span class="text-xl font-bold">PhishShield</span>
+            </div>
+            
+            <div class="flex space-x-2 md:space-x-4 ml-auto w-full md:w-auto md:w-auto">
+                <a href="#" class="nav-link text-center bg-blue-700 bg-opacity-50">Inicio</a>
+                <a href="/stats" class="nav-link text-center">Estadísticas</a>
+            </div>
+            
+            <div class="hidden md:flex items-center">
+                <!-- Espacio reservado para alinear correctamente los elementos -->
+                <div class="w-12"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-16">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6" data-aos="fade-up">
+                Protección avanzada contra phishing
+            </h1>
+            <p class="mb-8 max-w-2xl mx-auto text-center text-lg whitespace-nowrap" data-aos="fade-up" data-aos-delay="100">
+                Analiza URLs en tiempo real con inteligencia artificial y múltiples fuentes de seguridad
+            </p>
+            <div class="max-w-2xl mx-auto bg-white rounded-lg p-1 shadow-xl" data-aos="fade-up" data-aos-delay="200">
+                <form id="url-form" class="flex">
+                    <input 
+                        type="text" 
+                        id="url-input"
+                        placeholder="Introduce una URL para analizar (ej. https://ejemplo.com)" 
+                        class="flex-grow px-4 py-3 rounded-l-lg text-gray-800 focus:outline-none"
+                    >
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 font-medium transition">
+                        <i data-feather="search" class="inline mr-2"></i> Analizar
+                    </button>
+                    <button type="button" id="clear-btn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-3 rounded-r-lg font-medium transition">
+                        <i data-feather="trash-2" class="inline mr-1"></i> 
+                    </button>
+                </form>
+            </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Loading Section -->
+    <section id="loading-section" class="py-16 bg-white hidden">
+        <div class="container mx-auto px-4 text-center">
+            <div class="max-w-2xl mx-auto">
+                <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-16 w-16 mx-auto mb-6"></div>
+                
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Analizando URL</h3>
+                <p class="text-gray-600 mb-6">Estamos examinando múltiples factores de seguridad en tiempo real</p>
+                
+                <!-- Barra de progreso animada -->
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                
+                <!-- Pasos del análisis -->
+                <div class="grid grid-cols-4 gap-4 mb-8 mt-8">
+                    <div class="step-item">
+                        <div class="step-icon" id="step-1">
+                            <i data-feather="globe" class="w-5 h-5"></i>
+                        </div>
+                        <span class="step-text" id="step-text-1">Dominio</span>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-icon" id="step-2">
+                            <i data-feather="lock" class="w-5 h-5"></i>
+                        </div>
+                        <span class="step-text" id="step-text-2">SSL</span>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-icon" id="step-3">
+                            <i data-feather="database" class="w-5 h-5"></i>
+                        </div>
+                        <span class="step-text" id="step-text-3">Reputación</span>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-icon" id="step-4">
+                            <i data-feather="shield" class="w-5 h-5"></i>
+                        </div>
+                        <span class="step-text" id="step-text-4">Resultado</span>
+                    </div>
+                </div>
+                
+                <!-- Estadísticas en tiempo real -->
+                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <div class="grid grid-cols-2 gap-4 text-left">
+                        <div>
+                            <p class="text-sm text-gray-600">Tiempo transcurrido</p>
+                            <p class="font-semibold"><span id="elapsed-time">0</span>s</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">APIS consultadas</p>
+                            <p class="font-semibold"><span id="apis-checked">0</span>/3</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <p class="text-sm text-gray-500">Este proceso puede tomar unos segundos...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results-section" class="py-16 bg-gray-50 result-section">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Resultados del análisis</h2>
+            
+            <div class="max-w-6xl mx-auto">
+                <!-- Panel principal de resultados -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6">
+                    <div class="p-6 border-b border-gray-200">
+                        <div class="flex justify-between items-center">
+                            <h3 id="result-url" class="text-xl font-semibold"></h3>
+                            <span id="risk-badge" class="px-3 py-1 rounded-full text-sm font-medium"></span>
+                        </div>
+                        <p class="text-gray-500 mt-1" id="analysis-time">Analizado hace unos momentos</p>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                        <!-- Left Column -->
+                        <div>
+                            <h4 class="font-medium text-lg mb-3">Detalles técnicos</h4>
+                            <div class="space-y-4" id="technical-details">
+                                <!-- Los detalles técnicos se llenarán con JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <!-- Right Column -->
+                        <div>
+                            <h4 class="font-medium text-lg mb-3">Resultados de APIs</h4>
+                            <div class="space-y-4" id="api-results">
+                                <!-- Los resultados de APIs se llenarán con JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                        <h4 class="font-medium mb-2">Recomendación</h4>
+                        <p id="recommendation" class="text-red-600"></p>
+                    </div>
+                </div>
+                
+                <!-- Panel de VirusTotal (inicialmente oculto) -->
+                <div id="virustotal-panel" class="bg-white rounded-xl shadow-md overflow-hidden hidden">
+                    <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+                        <h3 class="text-lg font-semibold flex items-center">
+                            <img src="https://www.virustotal.com/gui/images/vt-enterprise.svg" alt="VirusTotal" class="w-6 h-6 mr-2">
+                            Análisis de VirusTotal
+                        </h3>
+                        <button id="refresh-vt" class="text-blue-600 hover:text-blue-800 text-sm flex items-center">
+                            <i data-feather="refresh-cw" class="w-4 h-4 mr-1"></i> Ocultar
+                        </button>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div id="vt-loading" class="text-center py-8">
+                            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-8 w-8 mx-auto mb-4"></div>
+                            <p class="text-gray-600">Cargando datos de VirusTotal...</p>
+                        </div>
+                        
+                        <div id="vt-content" class="hidden">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                                    <h4 class="font-medium text-red-800 text-sm mb-1">Detectado como malicioso</h4>
+                                    <p id="vt-malicious" class="text-2xl font-bold text-red-600">0/0</p>
+                                </div>
+                                <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                                    <h4 class="font-medium text-yellow-800 text-sm mb-1">Sospechoso</h4>
+                                    <p id="vt-suspicious" class="text-2xl font-bold text-yellow-600">0/0</p>
+                                </div>
+                                <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                                    <h4 class="font-medium text-green-800 text-sm mb-1">Limpio</h4>
+                                    <p id="vt-clean" class="text-2xl font-bold text-green-600">0/0</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h4 class="font-medium mb-2">Resultados por motor</h4>
+                                <div id="vt-engines" class="bg-gray-50 rounded-lg p-4 max-h-64 overflow-y-auto">
+                                    <!-- Los resultados de los motores se insertarán aquí -->
+                                </div>
+                            </div>
+                            
+                            <div class="text-center text-sm text-gray-500">
+                                <p>Datos proporcionados por VirusTotal API</p>
+                                <p id="vt-last-updated" class="text-xs mt-1"></p>
+                            </div>
+                        </div>
+                        
+                        <div id="vt-error" class="hidden text-center py-8">
+                            <i data-feather="alert-triangle" class="w-12 h-12 text-yellow-500 mx-auto mb-4"></i>
+                            <p class="text-gray-600">No se pudieron cargar los datos de VirusTotal</p>
+                            <button id="retry-vt" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
+                                Reintentar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</section>
+
+    <!-- Sección de URLs del Historial -->
+    <section class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12">
+                <span class="bg-gradient-to-r from-orange-500 to-yellow-600 to-indigo-600 to-pink-600 to-cyan-600 bg-clip-text text-transparent pb-1">
+                    Historial de URLs Analizadas
+                </span>
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <!-- URLs Seguras del Historial -->
+                <div class="bg-green-50 border border-green-200 rounded-xl p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                            <i data-feather="check-circle" class="text-green-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-green-800">URLs Seguras</h3>
+                    </div>
+                    <p class="text-green-700 mb-4">URLs del historial clasificadas como seguras:</p>
+                    <button onclick="loadSafeUrls()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium transition">
+                        <i data-feather="shield" class="inline mr-2"></i> Ver URLs Seguras
+                    </button>
+                    <div id="safe-urls-list" class="hidden mt-4">
+                        <!-- Contenedor con scroll -->
+                        <div class="max-h-64 overflow-y-auto border border-green-200 rounded-lg p-2 bg-white">
+                            <!-- Las URLs seguras se cargarán aquí -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- URLs Maliciosas del Historial -->
+                <div class="bg-red-50 border border-red-200 rounded-xl p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                            <i data-feather="alert-triangle" class="text-red-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-red-800">URLs Maliciosas</h3>
+                    </div>
+                    <p class="text-red-700 mb-4">URLs del historial clasificadas como maliciosas:</p>
+                    <button onclick="loadMaliciousUrls()" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-medium transition">
+                        <i data-feather="alert-octagon" class="inline mr-2"></i> Ver URLs Maliciosas
+                    </button>
+                    <div id="malicious-urls-list" class="hidden mt-4">
+                        <!-- Contenedor con scroll -->
+                        <div class="max-h-64 overflow-y-auto border border-red-200 rounded-lg p-2 bg-white">
+                            <!-- Las URLs maliciosas se cargarán aquí -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12">
+                <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent pb-1">
+                    Tecnologías Integradas
+                </span>
+            </h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl shadow-lg p-6 border border-blue-100" data-aos="fade-up">
+                    <div class="w-12 h-12 bg-blue-200 rounded-xl flex items-center justify-center mb-4 shadow-md">
+                        <i data-feather="cpu" class="text-blue-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-blue-800">IA Heurística contra Phishing</h3>
+                    <p class="text-blue-600">
+                        Sistema de detección basado en técnicas de inteligencia artificial heurística. 
+                    </p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="bg-gradient-to-br from-green-50 to-teal-100 rounded-2xl shadow-lg p-6 border border-green-100" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-12 h-12 bg-green-200 rounded-xl flex items-center justify-center mb-4 shadow-md">
+                        <i data-feather="shield" class="text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-green-800">APIs de Seguridad</h3>
+                    <p class="text-green-600">
+                        Integración con PhishTank y VirusTotal.
+                    </p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="bg-gradient-to-br from-purple-50 to-pink-100 rounded-2xl shadow-lg p-6 border border-purple-100" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-12 h-12 bg-purple-200 rounded-xl flex items-center justify-center mb-4 shadow-md">
+                        <i data-feather="database" class="text-purple-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-purple-800">Base de Datos</h3>
+                    <p class="text-purple-600">
+                        Almacenamiento seguro de análisis con historial completo y metadatos.
+                    </p>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="bg-gradient-to-br from-orange-50 to-amber-100 rounded-2xl shadow-lg p-6 border border-orange-100" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-12 h-12 bg-orange-200 rounded-xl flex items-center justify-center mb-4 shadow-md">
+                        <i data-feather="refresh-cw" class="text-orange-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-orange-800">Actualización Constante</h3>
+                    <p class="text-orange-600">
+                        Modelos y reglas actualizados diariamente para máxima protección.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i data-feather="shield" class="w-8 h-8 text-blue-400"></i>
+                        <span class="text-xl font-bold">PhishShield</span>
+                    </div>
+                    <p class="text-gray-400">
+                        Solución avanzada de detección de phishing con inteligencia artificial y múltiples fuentes de seguridad.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Enlaces</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/docs" class="text-gray-400 hover:text-white transition">Documentación</a></li>
+                        <li><a href="/api-rest" class="text-gray-400 hover:text-white transition">API REST</a></li>
+                        <li><a href="/stats" class="text-gray-400 hover:text-white transition">Estadísticas</a></li>
+                        <li><a href="/blog" class="text-gray-400 hover:text-white transition">Blog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/terms" class="text-gray-400 hover:text-white transition">Términos</a></li>
+                        <li><a href="/privacy" class="text-gray-400 hover:text-white transition">Privacidad</a></li>
+                        <li><a href="/security" class="text-gray-400 hover:text-white transition">Seguridad</a></li>
+                        <li><a href="/gdpr" class="text-gray-400 hover:text-white transition">GDPR</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contacto</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center space-x-2 text-gray-400">
+                            <i data-feather="mail" class="w-4 h-4"></i>
+                            <span>soporte@phishshield.com</span>
+                        </li>
+                        <li class="flex items-center space-x-2 text-gray-400">
+                            <i data-feather="twitter" class="w-4 h-4"></i>
+                            <span>@phishshield</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500 text-sm">
+                <p>© 2025 PhishShield. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Inicialización
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+        feather.replace();
+
+        // Elementos del DOM
+        const urlForm = document.getElementById('url-form');
+        const urlInput = document.getElementById('url-input');
+        const loadingSection = document.getElementById('loading-section');
+        const resultsSection = document.getElementById('results-section');
+        const resultUrl = document.getElementById('result-url');
+        const riskBadge = document.getElementById('risk-badge');
+        const technicalDetails = document.getElementById('technical-details');
+        const apiResults = document.getElementById('api-results');
+        const recommendation = document.getElementById('recommendation');
+
+        // Función para mostrar razones de detección heurística
+        function showHeuristicReasons(reasons) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-md w-full">
+                    <div class="flex items-center mb-4">
+                        <i data-feather="alert-triangle" class="w-6 h-6 text-yellow-500 mr-2"></i>
+                        <h3 class="text-xl font-semibold">Análisis Heurístico</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">Se detectaron las siguientes características sospechosas:</p>
+                    <ul class="list-disc list-inside space-y-2 mb-6">
+                        ${reasons.map(reason => `<li class="text-gray-700">${reason}</li>`).join('')}
+                    </ul>
+                    <button onclick="this.closest('.fixed').remove()" 
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition">
+                        Cerrar
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            feather.replace();
+        }
+
+        // Función para limpiar el formulario y resultados
+        function clearForm() {
+            // Limpiar input
+            urlInput.value = '';
+            
+            // Ocultar resultados
+            resultsSection.classList.add('result-section');
+            
+            // Ocultar panel de VirusTotal
+            document.getElementById('virustotal-panel').classList.add('hidden');
+            
+            // Ocultar paneles de URLs seguras/maliciosas
+            clearUrlPanels();
+            
+            // Resetear VirusTotal
+            resetVirusTotalPanel();
+            
+            // Enfocar el input
+            urlInput.focus();
+        }
+
+        // Event listener para el botón de limpiar
+        document.getElementById('clear-btn').addEventListener('click', clearForm);
+
+        // También puedes agregar la tecla Escape para limpiar
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                clearForm();
+            }
+        });
+
+        // Función para resetear el panel de VirusTotal
+        function resetVirusTotalPanel() {
+            const vtLoading = document.getElementById('vt-loading');
+            const vtContent = document.getElementById('vt-content');
+            const vtError = document.getElementById('vt-error');
+            
+            // Restablecer contenido de loading
+            vtLoading.innerHTML = `
+                <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-8 w-8 mx-auto mb-4"></div>
+                <p class="text-gray-600">Cargando datos de VirusTotal...</p>
+            `;
+            
+            // Ocultar todo excepto loading
+            vtLoading.classList.remove('hidden');
+            vtContent.classList.add('hidden');
+            vtError.classList.add('hidden');
+            
+            // Restablecer valores
+            document.getElementById('vt-malicious').textContent = '0/0';
+            document.getElementById('vt-suspicious').textContent = '0/0';
+            document.getElementById('vt-clean').textContent = '0/0';
+            document.getElementById('vt-engines').innerHTML = '';
+            document.getElementById('vt-last-updated').textContent = '';
+        }
+
+        // Función para mostrar/ocultar panel de VirusTotal
+        function toggleVirusTotalPanel() {
+            const vtPanel = document.getElementById('virustotal-panel');
+            vtPanel.classList.toggle('hidden');
+            
+            // Si se está ocultando, resetear para la próxima vez
+            if (vtPanel.classList.contains('hidden')) {
+                resetVirusTotalPanel();
+            }
+        }
+
+        // Función para cargar datos de VirusTotal
+        async function loadVirusTotalData(url) {
+            // Resetear el panel primero
+            resetVirusTotalPanel();
+            
+            // Mostrar el panel si está oculto
+            const vtPanel = document.getElementById('virustotal-panel');
+            if (vtPanel.classList.contains('hidden')) {
+                vtPanel.classList.remove('hidden');
+            }
+            
+            const vtLoading = document.getElementById('vt-loading');
+            const vtContent = document.getElementById('vt-content');
+            const vtError = document.getElementById('vt-error');
+            
+            try {
+                // Llamar a la API de VirusTotal a través de nuestro backend
+                const response = await fetch('/virustotal-data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta de VirusTotal');
+                }
+                
+                const data = await response.json();
+                
+                // Si el análisis está en proceso
+                if (data.status === 'processing') {
+                    vtLoading.innerHTML = `
+                        <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-8 w-8 mx-auto mb-4"></div>
+                        <p class="text-gray-600">${data.message || 'El análisis está en proceso. Por favor, actualiza en unos momentos.'}</p>
+                    `;
+                    return;
+                }
+                
+                // Si hay un error en la respuesta
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Actualizar la UI con los datos
+                document.getElementById('vt-malicious').textContent = `${data.malicious || 0}/${data.total || 0}`;
+                document.getElementById('vt-suspicious').textContent = `${data.suspicious || 0}/${data.total || 0}`;
+                document.getElementById('vt-clean').textContent = `${data.clean || 0}/${data.total || 0}`;
+                
+                // Actualizar resultados por motor
+                const enginesContainer = document.getElementById('vt-engines');
+                enginesContainer.innerHTML = '';
+                
+                if (data.engine_results && data.engine_results.length > 0) {
+                    // Ordenar resultados: maliciosos primero, luego limpios, luego no detectados
+                    const sortedEngines = data.engine_results.sort((a, b) => {
+                        // Asignar pesos para el ordenamiento
+                        const getWeight = (engine) => {
+                            if (engine.category === 'malicious' || engine.result === 'malicious') return 0;
+                            if (engine.category === 'suspicious' || engine.result === 'suspicious') return 1;
+                            if (engine.category === 'harmless' || engine.result === 'clean') return 2;
+                            if (engine.category === 'undetected' || engine.result === 'undetected') return 3;
+                            return 4; // Otros casos
+                        };
+                        
+                        return getWeight(a) - getWeight(b);
+                    });
+                    
+                    sortedEngines.forEach(engine => {
+                        const engineEl = document.createElement('div');
+                        engineEl.className = 'flex justify-between items-center py-2 border-b border-gray-100';
+                        
+                        let resultClass = 'text-gray-600';
+                        let resultIcon = 'check';
+                        let resultText = engine.category || 'Limpio';
+                        
+                        if (engine.category === 'malicious' || engine.result === 'malicious') {
+                            resultClass = 'text-red-600';
+                            resultIcon = 'x-circle';
+                            resultText = 'Malicioso';
+                        } else if (engine.category === 'suspicious' || engine.result === 'suspicious') {
+                            resultClass = 'text-yellow-600';
+                            resultIcon = 'alert-circle';
+                            resultText = 'Sospechoso';
+                        } else if (engine.category === 'undetected' || engine.result === 'undetected') {
+                            resultClass = 'text-gray-500';
+                            resultIcon = 'minus';
+                            resultText = 'No detectado';
+                        } else if (engine.category === 'harmless' || engine.result === 'clean') {
+                            resultClass = 'text-green-600';
+                            resultIcon = 'check';
+                            resultText = 'Limpio';
+                        }
+                        
+                        engineEl.innerHTML = `
+                            <div class="flex items-center">
+                                <span class="font-medium">${engine.engine}</span>
+                            </div>
+                            <div class="flex items-center ${resultClass}">
+                                <i data-feather="${resultIcon}" class="w-4 h-4 mr-1"></i>
+                                <span>${resultText}</span>
+                            </div>
+                        `;
+                        
+                        enginesContainer.appendChild(engineEl);
+                    });
+                } else {
+                    enginesContainer.innerHTML = '<p class="text-gray-500 text-center">No hay datos de motores disponibles</p>';
+                }
+                
+                // Actualizar fecha de última actualización
+                if (data.last_updated) {
+                    // Asegurarse de que last_updated es un valor numérico (timestamp)
+                    const timestamp = typeof data.last_updated === 'number' ? data.last_updated * 1000 : data.last_updated;
+                    document.getElementById('vt-last-updated').textContent = `Última actualización: ${new Date(timestamp).toLocaleString()}`;
+                } else {
+                    document.getElementById('vt-last-updated').textContent = 'Última actualización: No disponible';
+                }
+                
+                // Mostrar contenido, ocultar loading
+                vtLoading.classList.add('hidden');
+                vtContent.classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('Error cargando datos de VirusTotal:', error);
+                vtLoading.classList.add('hidden');
+                vtError.classList.remove('hidden');
+                
+                // Mostrar mensaje de error específico
+                const errorMessage = document.createElement('p');
+                errorMessage.className = 'text-gray-600 mb-4';
+                errorMessage.textContent = error.message || 'No se pudieron cargar los datos de VirusTotal';
+                vtError.appendChild(errorMessage);
+            }
+            
+            // Actualizar iconos de Feather
+            feather.replace();
+        }
+
+        // Mostrar resultados en la interfaz
+        function displayResults(data) {
+            // RESETEAR EL PANEL DE VIRUSTOTAL AL CAMBIAR DE URL
+            resetVirusTotalPanel();
+            document.getElementById('virustotal-panel').classList.add('hidden');
+
+            // Variables para el estado del dominio
+            // Llenar detalles técnicos
+            const domainAge = data.domain_age || 0;
+            const hasDomain = domainAge > 0;
+            const urlLength = data.features ? data.features.length : data.url.length;
+            const hasHttps = data.features ? data.features.is_https : false;
+            const shouldShowRed = data.virustotal_result;
+
+            resultUrl.textContent = data.url;
+            
+            // Configurar badge de riesgo con icono
+            let riskText, riskClass, riskIcon;
+            if (data.risk_score >= 8) {                    // Cambiado: 8-10
+                riskText = 'Malicioso';
+                riskClass = 'bg-red-100 text-red-800';
+                riskIcon = 'alert-triangle';
+            } else if (data.risk_score >= 5) {             // Cambiado: 5-7
+                riskText = 'Riesgo';
+                riskClass = 'bg-orange-100 text-orange-800';
+                riskIcon = 'alert-circle';
+            } else if (data.risk_score >= 3) {             // Cambiado: 3-4
+                riskText = 'Bajo riesgo';
+                riskClass = 'bg-yellow-100 text-yellow-800';
+                riskIcon = 'info';
+            } else {                                       // Cambiado: 0-2
+                riskText = 'Seguro';
+                riskClass = 'bg-green-100 text-green-800';
+                riskIcon = 'check-circle';
+            }
+
+            riskBadge.innerHTML = `
+                <div class="flex items-center">
+                    <i data-feather="${riskIcon}" class="w-4 h-4 mr-1"></i>
+                    ${riskText}
+                </div>
+            `;
+            riskBadge.className = `px-3 py-1 rounded-full text-sm font-medium ${riskClass}`;
+            
+            // Llenar detalles técnicos
+            technicalDetails.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span class="text-sm text-gray-600 font-medium">Antigüedad del dominio</span>
+                            <span class="${hasDomain ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}">
+                                ${hasDomain ? `hace ${domainAge} días` : 'No registrado'}
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span class="text-sm text-gray-600 font-medium">Longitud de URL</span>
+                            <span class="${urlLength > 75 ? 'text-yellow-600 font-semibold' : 'text-gray-700 font-semibold'}">
+                                ${urlLength} caracteres
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center py-2">
+                            <span class="text-sm text-gray-600 font-medium">Protocolo seguro</span>
+                            <span class="${hasHttps ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}">
+                                ${hasHttps ? 'HTTPS ✅' : 'HTTP ❌'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <h4 class="font-semibold text-blue-700 mb-3 flex items-center">
+                        <i data-feather="activity" class="w-4 h-4 mr-2 text-blue-600"></i>
+                        Puntuación de Riesgo
+                    </h4>
+                    <div class="text-center">
+                        <div class="inline-flex items-baseline mb-2">
+                            <span class="text-3xl font-bold ${data.risk_score >= 8 ? 'text-red-600' : data.risk_score >= 5 ? 'text-orange-600' : data.risk_score >= 3 ? 'text-yellow-600' : 'text-green-600'}">
+                                ${data.risk_score}<span class="text-gray-500 ml-1">/10</span> 
+                            </span>
+                        </div> 
+                        <div class="h-3 rounded-full ${
+                            data.risk_score >= 8 ? 'bg-red-500' : 
+                            data.risk_score >= 5 ? 'bg-orange-500' : 
+                            data.risk_score >= 3 ? 'bg-yellow-500' : 'bg-green-500'
+                        }" 
+                            style="width: ${data.risk_score * 10}%"></div>
+                        </div>
+                        <p class="text-sm text-gray-600">
+                            ${
+                                data.risk_score >= 8 ? 'Malicioso' : 
+                                data.risk_score >= 5 ? 'Riesgo' : 
+                                data.risk_score >= 3 ? 'Bajo riesgo' : 'Seguro'
+                            }
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            // Llenar resultados de APIs
+            apiResults.innerHTML = `
+                <div class="grid gap-3">
+                    <div class="flex items-center justify-between p-4 rounded-lg ${data.virustotal_result ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'}">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full ${data.virustotal_result ? 'bg-red-100' : 'bg-green-100'} flex items-center justify-center mr-3">
+                                <i data-feather="bar-chart-2" class="${data.virustotal_result ? 'text-red-500' : 'text-green-500'}"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-800">VirusTotal</p>
+                                <p class="text-sm text-gray-600">Análisis multi-motor</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-sm font-semibold ${data.virustotal_result ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}">
+                            ${data.virustotal_result ? 'Detectado' : 'Limpio'}
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 rounded-lg ${data.virustotal_result ? 'bg-green-50 border border-green-200' : (data.is_malicious ? 'bg-yellow-50 border border-yellow-200' : 'bg-green-50 border border-green-200')}">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full ${data.virustotal_result ? 'bg-green-100' : (data.is_malicious ? 'bg-yellow-100' : 'bg-green-100')} flex items-center justify-center mr-3">
+                                <i data-feather="cpu" class="${data.virustotal_result ? 'text-green-500' : (data.is_malicious ? 'text-yellow-500' : 'text-green-500')}"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-800">Análisis Heurístico</p>
+                                <p class="text-sm text-gray-600">Detección proactiva</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-sm font-semibold ${data.virustotal_result ? 'bg-green-100 text-green-700' : (data.is_malicious ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700')}">
+                            ${data.virustotal_result ? 'Seguro' : (data.is_malicious ? 'Sospechoso' : 'Seguro')}
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 rounded-lg ${data.phish_result ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'}">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full ${data.phish_result ? 'bg-red-100' : 'bg-green-100'} flex items-center justify-center mr-3">
+                                <i data-feather="alert-triangle" class="${data.phish_result ? 'text-red-500' : 'text-green-500'}"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-800">PhishTank</p>
+                                <p class="text-sm text-gray-600">Base de datos colaborativa</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-sm font-semibold ${data.phish_result ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}">
+                            ${data.phish_result ? 'Reportado' : 'No reportado'}
+                        </span>
+                    </div>
+                </div>
+            `;
+            
+            // Configurar recomendación
+            let recommendationText, recommendationClass;
+            if (data.is_malicious) {
+                recommendationText = 'No acceder a este sitio. Parece ser una página falsa diseñada para robar información personal.';
+                recommendationClass = 'text-red-600';
+            } else if (data.risk_score >= 5) {
+                recommendationText = 'Precaución: Este sitio tiene características sospechosas. Se recomienda evitar ingresar información personal.';
+                recommendationClass = 'text-yellow-600';
+            } else {
+                recommendationText = 'Este sitio parece seguro. Aún así, mantenga siempre precauciones al ingresar información sensible.';
+                recommendationClass = 'text-green-600';
+            }
+            
+            recommendation.innerHTML = `<span class="font-semibold">${recommendationText}</span>`;
+            recommendation.className = recommendationClass;
+            
+            // Añadir botón para mostrar VirusTotal
+            recommendation.innerHTML = `
+                <span class="font-semibold ${recommendationClass}">${recommendationText}</span>
+                
+                ${data.heuristic_reasons && data.heuristic_reasons.length > 0 ? `
+                    <div class="mt-4">
+                        <button onclick="showHeuristicReasons(${JSON.stringify(data.heuristic_reasons).replace(/"/g, '&quot;')})" 
+                                class="text-yellow-600 hover:text-yellow-800 text-sm flex items-center font-medium">
+                            <i data-feather="alert-triangle" class="w-4 h-4 mr-1"></i>
+                            Ver detalles heurísticos (${data.heuristic_reasons.length} detecciones)
+                        </button>
+                    </div>
+                ` : ''}
+                
+                <div class="mt-3">
+                    <button id="show-virustotal" class="text-blue-600 hover:text-blue-800 text-sm flex items-center">
+                        <i data-feather="bar-chart-2" class="w-4 h-4 mr-1"></i> Ver análisis completo de VirusTotal
+                    </button>
+                </div>
+            `;
+
+            // Remover event listeners anteriores si existen
+            const oldShowButton = document.getElementById('show-virustotal');
+            if (oldShowButton) {
+                oldShowButton.replaceWith(oldShowButton.cloneNode(true));
+            }
+            
+            const refreshBtn = document.getElementById('refresh-vt');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function() {
+                    // Ocultar el panel de VirusTotal en lugar de actualizar
+                    document.getElementById('virustotal-panel').classList.add('hidden');
+            });
+                
+                // También cambiar el texto e icono del botón
+                refreshBtn.innerHTML = '<i data-feather="eye-off" class="w-4 h-4 mr-1"></i> Ocultar';
+            }
+            
+            const oldRetryButton = document.getElementById('retry-vt');
+            if (oldRetryButton) {
+                oldRetryButton.replaceWith(oldRetryButton.cloneNode(true));
+            }
+            
+            // Añadir event listeners para el panel de VirusTotal
+            document.getElementById('show-virustotal').addEventListener('click', function() {
+                toggleVirusTotalPanel();
+                loadVirusTotalData(data.url);
+            });
+            
+            // Si ya existe el botón de retry, añadir el event listener
+            const retryBtn = document.getElementById('retry-vt');
+            if (retryBtn) {
+                retryBtn.addEventListener('click', function() {
+                    loadVirusTotalData(data.url);
+                });
+            }
+            
+            // Asegurar que los iconos se rendericen
+            setTimeout(() => {
+                feather.replace();
+            }, 50);
+        }
+
+        // Validación en tiempo real para URLs sin protocolo
+        urlInput.addEventListener('input', function() {
+            this.setCustomValidity('');
+        });
+
+        urlInput.addEventListener('invalid', function() {
+            this.setCustomValidity('Por favor, introduce un dominio válido. Ejemplo: ejemplo.com');
+        });
+
+        // Inicializar el panel de VirusTotal como oculto al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            resetVirusTotalPanel();
+        });
+
+        // Variables para el control de la animación de carga
+        let loadingInterval;
+        let timeInterval;
+        let elapsedSeconds = 0;
+        let currentStep = 0;
+        const totalSteps = 4;
+        const totalApis = 3;
+
+        // Función para resetear los pasos a su estado inicial
+        function resetLoadingSteps() {
+            for (let i = 1; i <= totalSteps; i++) {
+                const stepIcon = document.getElementById(`step-${i}`);
+                const stepText = document.getElementById(`step-text-${i}`);
+                
+                // Remover todas las clases de estado
+                stepIcon.classList.remove('active', 'completed');
+                stepText.classList.remove('active', 'completed');
+            }
+            
+            // Resetear contadores
+            document.getElementById('apis-checked').textContent = '0';
+            document.getElementById('elapsed-time').textContent = '0';
+        }
+
+        // Función para iniciar la animación de carga
+        function startLoadingAnimation() {
+            // Primero resetear todos los pasos
+            resetLoadingSteps();
+            
+            // Reiniciar contadores
+            elapsedSeconds = 0;
+            currentStep = 0;
+            
+            // Actualizar contador de tiempo cada segundo
+            const timeElement = document.getElementById('elapsed-time');
+            timeElement.textContent = elapsedSeconds;
+            
+            // Limpiar intervalos previos si existen
+            if (timeInterval) clearInterval(timeInterval);
+            if (loadingInterval) clearInterval(loadingInterval);
+            
+            // Iniciar el contador de tiempo
+            timeInterval = setInterval(() => {
+                elapsedSeconds++;
+                timeElement.textContent = elapsedSeconds;
+            }, 1000);
+            
+            // Iniciar la simulación de progreso
+            let apisChecked = 0;
+            const apisElement = document.getElementById('apis-checked');
+            
+            loadingInterval = setInterval(() => {
+                // Avanzar al siguiente paso solo si no hemos terminado
+                if (currentStep < totalSteps) {
+                    // Marcar paso anterior como completado
+                    if (currentStep > 0) {
+                        document.getElementById(`step-${currentStep}`).classList.add('completed');
+                        document.getElementById(`step-text-${currentStep}`).classList.add('completed');
+                    }
+                    
+                    // Avanzar al siguiente paso
+                    currentStep++;
+                    
+                    // Actualizar paso actual
+                    document.getElementById(`step-${currentStep}`).classList.add('active');
+                    document.getElementById(`step-text-${currentStep}`).classList.add('active');
+                    
+                    // Simular consulta a API
+                    if (currentStep > 1 && currentStep < totalSteps) {
+                        apisChecked++;
+                        apisElement.textContent = apisChecked;
+                    }
+                }
+            }, 800); // Velocidad de la animación (ms por paso)
+        }
+
+        // Función para detener la animación de carga
+        function stopLoadingAnimation() {
+            // Limpiar intervalos
+            if (loadingInterval) clearInterval(loadingInterval);
+            if (timeInterval) clearInterval(timeInterval);
+            
+            // NO resetear los pasos aquí para que se vea en qué paso se detuvo
+            // Solo detenemos la animación pero mantenemos el estado visual actual
+        }
+
+        // Modificar el event listener del formulario para usar la nueva animación
+        urlForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            let url = urlInput.value.trim();
+            
+            // Validación (código existente)
+            if (!url) {
+                alert('Por favor, introduce una URL');
+                return;
+            }
+            
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'http://' + url;
+            }
+            
+            try {
+                new URL(url);
+            } catch (error) {
+                alert('Por favor, introduce una URL válida. Ejemplo: ejemplo.com');
+                return;
+            }
+            
+            if (!url) return;
+            
+            // Mostrar carga con la nueva animación
+            loadingSection.classList.remove('hidden');
+            resultsSection.classList.add('result-section');
+            
+            // Iniciar animación de carga
+            startLoadingAnimation();
+            
+            try {
+                // Enviar la URL al backend para análisis
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url })
+                });
+                
+                // Verificar si la respuesta es exitosa
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Error del servidor');
+                }
+                
+                const data = await response.json();
+                
+                // Verificar si hay error en la respuesta
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Detener la animación (se queda en el paso actual)
+                stopLoadingAnimation();
+                
+                // Mostrar resultados
+                displayResults(data);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                // Detener animación
+                stopLoadingAnimation();
+                
+                // Ocultar loading después de un breve delay para que se vea el estado actual
+                setTimeout(() => {
+                    loadingSection.classList.add('hidden');
+                    alert('Error al analizar la URL: ' + error.message);
+                }, 500);
+            } finally {
+                // Ocultar sección de carga después de un breve delay
+                setTimeout(() => {
+                    loadingSection.classList.add('hidden');
+                    resultsSection.classList.remove('result-section');
+                }, 500);
+            }
+        });
+
+        // Función para cargar URLs seguras del historial
+        async function loadSafeUrls() {
+            const safeList = document.getElementById('safe-urls-list');
+            const maliciousList = document.getElementById('malicious-urls-list');
+            
+            // Si ya está abierto, cerrarlo (toggle)
+            if (!safeList.classList.contains('hidden')) {
+                safeList.classList.add('hidden');
+                return;
+            }
+            
+            // Ocultar lista maliciosa si está abierta
+            maliciousList.classList.add('hidden');
+            
+            try {
+                const response = await fetch('/api/urls');
+                if (!response.ok) throw new Error('Error al cargar historial');
+                
+                const data = await response.json();
+                const safeUrls = data.urls.filter(url => !url.is_malicious);
+                
+                displayUrlList(safeUrls, 'safe-urls-list', 'green');
+                safeList.classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar URLs seguras');
+            }
+        }
+
+        // Función para cargar URLs maliciosas del historial
+        async function loadMaliciousUrls() {
+            const safeList = document.getElementById('safe-urls-list');
+            const maliciousList = document.getElementById('malicious-urls-list');
+            
+            // Si ya está abierto, cerrarlo (toggle)
+            if (!maliciousList.classList.contains('hidden')) {
+                maliciousList.classList.add('hidden');
+                return;
+            }
+            
+            // Ocultar lista segura si está abierta
+            safeList.classList.add('hidden');
+            
+            try {
+                const response = await fetch('/api/urls');
+                if (!response.ok) throw new Error('Error al cargar historial');
+                
+                const data = await response.json();
+                const maliciousUrls = data.urls.filter(url => url.is_malicious);
+                
+                displayUrlList(maliciousUrls, 'malicious-urls-list', 'red');
+                maliciousList.classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar URLs maliciosas');
+            }
+        }
+
+        // Función para cargar URLs maliciosas del historial
+        async function loadMaliciousUrls() {
+            const safeList = document.getElementById('safe-urls-list');
+            const maliciousList = document.getElementById('malicious-urls-list');
+            
+            // Ocultar lista segura si está abierta
+            safeList.classList.add('hidden');
+            
+            // Si ya está cargada, solo toggle
+            if (maliciousList.innerHTML && !maliciousList.classList.contains('hidden')) {
+                maliciousList.classList.add('hidden');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/urls');
+                if (!response.ok) throw new Error('Error al cargar historial');
+                
+                const data = await response.json();
+                const maliciousUrls = data.urls.filter(url => url.is_malicious);
+                
+                displayUrlList(maliciousUrls, 'malicious-urls-list', 'red');
+                maliciousList.classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar URLs maliciosas');
+            }
+        }
+
+        // Función para mostrar la lista de URLs (ACTUALIZADA)
+        function displayUrlList(urls, listId, color) {
+            const listContainer = document.getElementById(listId);
+            // Seleccionar el contenedor interno con scroll
+            const scrollContainer = listContainer.querySelector('div');
+            scrollContainer.innerHTML = '';
+            
+            if (urls.length === 0) {
+                scrollContainer.innerHTML = `<p class="text-gray-500 text-center p-4">No hay URLs en esta categoría</p>`;
+                return;
+            }
+            
+            urls.forEach(url => {
+                const urlItem = document.createElement('div');
+                urlItem.className = `bg-white rounded-lg border border-${color}-300 p-3 hover:bg-${color}-50 transition cursor-pointer mb-2 last:mb-0`;
+                urlItem.onclick = () => loadUrlFromHistory(url.url);
+                
+                urlItem.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-${color}-800 font-medium truncate" title="${url.url}">${url.url}</p>
+                            <p class="text-${color}-600 text-sm">Analizado: ${formatDate(url.analysis_date)}</p>
+                        </div>
+                        <i data-feather="arrow-right" class="text-${color}-500 ml-2"></i>
+                    </div>
+                `;
+                
+                scrollContainer.appendChild(urlItem);
+            });
+            
+            feather.replace();
+        }
+
+        // Función para cargar URL al formulario
+        function loadUrlFromHistory(url) {
+            urlInput.value = url;
+            
+            // Hacer scroll al formulario
+            document.querySelector('.gradient-bg').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        // Función para limpiar ambos paneles
+        function clearUrlPanels() {
+            const safeList = document.getElementById('safe-urls-list');
+            const maliciousList = document.getElementById('malicious-urls-list');
+            
+            safeList.classList.add('hidden');
+            maliciousList.classList.add('hidden');
+        }
+
+        // Función para formatear fecha (si no la tienes)
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('es-ES');
+        }
+
+        // Función para formatear fecha CORREGIDA
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            
+            // Ajustar a la zona horaria local
+            const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+            
+            return localDate.toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        }
+
+        // Asegurar que los intervalos se limpien si el usuario abandona la página
+        window.addEventListener('beforeunload', () => {
+            stopLoadingAnimation();
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+{% block title %}Blog | PhishShield{% endblock %}
+{% block content %}
+    <main class="flex-grow container mx-auto px-4 py-12 max-w-6xl">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-4 text-blue-800">Blog de Ciberseguridad</h1>
+            <p class="text-gray-600 text-lg">Consejos, noticias y análisis sobre protección contra phishing y amenazas web</p>
+        </div>
+
+        <div class="grid md:grid-cols-4 gap-8">
+            <!-- Sidebar -->
+            <div class="md:col-span-1">
+                <div class="sticky top-24 space-y-6">
+                    <!-- Categorías -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">📂 Categorías</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-blue-600 hover:text-blue-800 block py-1">🔒 Phishing</a></li>
+                            <li><a href="#" class="text-blue-600 hover:text-blue-800 block py-1">🛡️ Prevención</a></li>
+                            <li><a href="#" class="text-blue-600 hover:text-blue-800 block py-1">🧠 IA en Seguridad</a></li>
+                            <li><a href="#" class="text-blue-600 hover:text-blue-800 block py-1">📊 Estadísticas</a></li>
+                            <li><a href="#" class="text-blue-600 hover:text-blue-800 block py-1">⚙️ Tecnología</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Artículos Populares -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">🔥 Populares</h3>
+                        <ul class="space-y-3">
+                            <li>
+                                <a href="#" class="text-sm text-gray-700 hover:text-blue-600">
+                                    <div class="font-semibold">Cómo identificar phishing en 2024</div>
+                                    <div class="text-xs text-gray-500">15 Enero 2024</div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-sm text-gray-700 hover:text-blue-600">
+                                    <div class="font-semibold">IA vs Phishing: ¿Quién gana?</div>
+                                    <div class="text-xs text-gray-500">12 Enero 2024</div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-sm text-gray-700 hover:text-blue-600">
+                                    <div class="font-semibold">Top 10 técnicas de phishing</div>
+                                    <div class="text-xs text-gray-500">8 Enero 2024</div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Newsletter -->
+                    <div class="bg-blue-50 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-blue-800 mb-2">📧 Newsletter</h3>
+                        <p class="text-blue-700 text-sm mb-3">Recibe consejos de seguridad directamente en tu email.</p>
+                        <form class="space-y-2">
+                            <input type="email" placeholder="tu@email.com" class="w-full px-3 py-2 border border-blue-300 rounded-lg text-sm">
+                            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-200">
+                                Suscribirme
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido Principal -->
+            <div class="md:col-span-3 space-y-8">
+                <!-- Artículo Destacado -->
+                <article class="bg-white rounded-xl shadow-lg overflow-hidden border-l-4 border-blue-500">
+                    <div class="p-8">
+                        <div class="flex items-center mb-4">
+                            <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">Destacado</span>
+                            <span class="text-gray-500 text-sm ml-4"><span id="current-date"></span></span>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">Bienvenido al Blog de PhishShield</h2>
+                        <p class="text-gray-700 mb-6 text-lg">Tu fuente confiable de información sobre ciberseguridad, protección contra phishing y las últimas tendencias en amenazas web. Aquí encontrarás análisis profundos, consejos prácticos y las novedades de nuestra plataforma.</p>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 mb-6">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-blue-800 mb-2">🎯 Qué Encontrarás</h3>
+                                <ul class="list-disc ml-6 text-blue-700 space-y-1">
+                                    <li>Guías para identificar y evitar phishing</li>
+                                    <li>Análisis de técnicas de ataque actuales</li>
+                                    <li>Consejos de seguridad para usuarios y empresas</li>
+                                    <li>Novedades y actualizaciones de PhishShield</li>
+                                </ul>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-green-800 mb-2">🛡️ Nuestra Misión</h3>
+                                <ul class="list-disc ml-6 text-green-700 space-y-1">
+                                    <li>Educar sobre riesgos de seguridad</li>
+                                    <li>Promover prácticas seguras en línea</li>
+                                    <li>Compartir investigación en ciberseguridad</li>
+                                    <li>Construir una comunidad consciente</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 text-gray-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                    <span class="text-sm text-gray-600">1,245 vistas</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 text-gray-500 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                    </svg>
+                                    <span class="text-sm text-gray-600">89 likes</span>
+                                </div>
+                            </div>
+                            <a href="#" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200">
+                                Leer Más
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Grid de Artículos -->
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Artículo 1 -->
+                    <article class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition duration-300">
+                        <div class="p-6">
+                            <div class="flex items-center mb-3">
+                                <span class="bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded">Phishing</span>
+                                <span class="text-gray-500 text-xs ml-2">12 Ene 2024</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-3">Cómo Identificar Emails de Phishing en 2024</h3>
+                            <p class="text-gray-600 mb-4 text-sm">Las técnicas de phishing evolucionan constantemente. Aprende a detectar las señales más comunes en correos sospechosos y protege tu información personal.</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    5 min lectura
+                                </div>
+                                <a href="#" class="text-blue-600 hover:text-blue-800 font-semibold text-sm">
+                                    Leer artículo →
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Artículo 2 -->
+                    <article class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition duration-300">
+                        <div class="p-6">
+                            <div class="flex items-center mb-3">
+                                <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-2 py-1 rounded">IA</span>
+                                <span class="text-gray-500 text-xs ml-2">10 Ene 2024</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-3">Inteligencia Artificial vs Phishing: ¿Quién Gana?</h3>
+                            <p class="text-gray-600 mb-4 text-sm">Exploramos cómo la IA está revolucionando la detección de phishing y cómo los atacantes también la utilizan para crear amenazas más sofisticadas.</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    8 min lectura
+                                </div>
+                                <a href="#" class="text-blue-600 hover:text-blue-800 font-semibold text-sm">
+                                    Leer artículo →
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Artículo 3 -->
+                    <article class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition duration-300">
+                        <div class="p-6">
+                            <div class="flex items-center mb-3">
+                                <span class="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">Estadísticas</span>
+                                <span class="text-gray-500 text-xs ml-2">8 Ene 2024</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-3">Estadísticas de Phishing 2024: Lo que Debes Saber</h3>
+                            <p class="text-gray-600 mb-4 text-sm">Análisis de las últimas estadísticas globales sobre ataques de phishing. Sectores más afectados y tendencias emergentes en ciberseguridad.</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    6 min lectura
+                                </div>
+                                <a href="#" class="text-blue-600 hover:text-blue-800 font-semibold text-sm">
+                                    Leer artículo →
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Artículo 4 -->
+                    <article class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition duration-300">
+                        <div class="p-6">
+                            <div class="flex items-center mb-3">
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded">Tecnología</span>
+                                <span class="text-gray-500 text-xs ml-2">5 Ene 2024</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-3">Nuevas Características de PhishShield</h3>
+                            <p class="text-gray-600 mb-4 text-sm">Descubre las últimas actualizaciones de nuestra plataforma: mejoras en el algoritmo de IA, nueva API y funciones de análisis avanzado.</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    4 min lectura
+                                </div>
+                                <a href="#" class="text-blue-600 hover:text-blue-800 font-semibold text-sm">
+                                    Leer artículo →
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- Sección de Consejos Rápidos -->
+                <section class="bg-blue-50 rounded-xl p-8">
+                    <h2 class="text-2xl font-semibold text-blue-800 mb-6 text-center">💡 Consejos Rápidos de Seguridad</h2>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="text-center">
+                            <div class="bg-white rounded-lg p-4 shadow-md">
+                                <div class="text-2xl mb-2">🔍</div>
+                                <h3 class="font-semibold text-gray-800 mb-2">Verifica URLs</h3>
+                                <p class="text-gray-600 text-sm">Siempre revisa la URL antes de hacer clic. Busca errores ortográficos y dominios sospechosos.</p>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="bg-white rounded-lg p-4 shadow-md">
+                                <div class="text-2xl mb-2">📧</div>
+                                <h3 class="font-semibold text-gray-800 mb-2">Desconfía de Urgencia</h3>
+                                <p class="text-gray-600 text-sm">Los atacantes crean falsa urgencia. Tómate tu tiempo para verificar solicitudes inusuales.</p>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="bg-white rounded-lg p-4 shadow-md">
+                                <div class="text-2xl mb-2">🛡️</div>
+                                <h3 class="font-semibold text-gray-800 mb-2">Usa PhishShield</h3>
+                                <p class="text-gray-600 text-sm">Analiza URLs sospechosas con nuestra herramienta antes de visitarlas. Es rápido y gratuito.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Call to Action -->
+                <section class="text-center bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-8 text-white">
+                    <h2 class="text-2xl font-bold mb-4">¿Tienes un Tema que te Interese?</h2>
+                    <p class="mb-6 text-blue-100">Sugiérenos temas para futuros artículos o comparte tus experiencias con phishing.</p>
+                    <a href="mailto:blog@phishshield.com" class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition duration-200">
+                        📬 Contactar al Equipo
+                    </a>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // JavaScript para mostrar la fecha actual
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const formattedDate = today.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            document.getElementById('current-date').textContent = formattedDate;
+        });
+    </script>
+{% endblock %}

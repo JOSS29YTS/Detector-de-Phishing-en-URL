@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block title %}Términos de Uso | PhishShield{% endblock %}
+{% block content %}
+    <main class="flex-grow container mx-auto px-4 py-12 max-w-4xl">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-4 text-blue-800">Términos de Servicio</h1>
+            <p class="text-gray-600 text-lg">Última actualización: <span id="current-date"></span></p>
+        </div>
+
+        <div class="space-y-8">
+            <!-- Sección 1 -->
+            <section class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-blue-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    Aceptación de los Términos
+                </h2>
+                <p class="text-gray-700 mb-4">Al utilizar PhishShield, usted acepta cumplir con estos términos de servicio y nuestra <a href="/privacy" class="text-blue-600 hover:text-blue-800 underline">Política de Privacidad</a>.</p>
+                <ul class="list-disc ml-6 text-gray-700 space-y-2">
+                    <li>Debe tener al menos 13 años para utilizar nuestro servicio</li>
+                    <li>Es responsable del uso que haga de la plataforma</li>
+                    <li>Acepta que el servicio puede evolucionar o discontinuarse</li>
+                </ul>
+            </section>
+
+            <!-- Sección 2 -->
+            <section class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-green-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    Uso del Servicio de Análisis
+                </h2>
+                <div class="space-y-4">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-blue-800 mb-2">✅ Uso Permitido</h3>
+                        <ul class="list-disc ml-6 text-blue-700 space-y-1">
+                            <li>Análisis personal de URLs para verificar su seguridad</li>
+                            <li>Uso educativo y de investigación en ciberseguridad</li>
+                            <li>Integración en sistemas corporativos con licencia apropiada</li>
+                            <li>Desarrollo de herramientas de seguridad no comerciales</li>
+                        </ul>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-red-800 mb-2">🚫 Uso Prohibido</h3>
+                        <ul class="list-disc ml-6 text-red-700 space-y-1">
+                            <li>Actividades maliciosas o de hacking</li>
+                            <li>Spam o envío masivo de solicitudes</li>
+                            <li>Análisis de sistemas sin autorización</li>
+                            <li>Comercialización del servicio sin licencia</li>
+                            <li>Alteración o ingeniería inversa de nuestra tecnología</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 3 -->
+            <section class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-yellow-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                    </svg>
+                    Limitaciones de Responsabilidad
+                </h2>
+                <div class="space-y-4 text-gray-700">
+                    <p><strong>PhishShield utiliza inteligencia artificial y múltiples fuentes de threat intelligence</strong>, pero no podemos garantizar la detección del 100% de las amenazas.</p>
+                    
+                    <div class="bg-yellow-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-yellow-800 mb-2">⚠️ Advertencias Importantes</h4>
+                        <ul class="list-disc ml-6 text-yellow-700 space-y-2">
+                            <li>Los resultados del análisis son informativos, no constituyen garantía absoluta</li>
+                            <li>No nos hacemos responsables por daños derivados del uso de URLs analizadas</li>
+                            <li>La base de datos se actualiza constantemente, pero nuevas amenazas pueden aparecer</li>
+                            <li>Recomendamos usar PhishShield como una capa más de seguridad, no como única solución</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 4 -->
+            <section class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-purple-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9m0 0v12m0 0h6m-6 0h6"/>
+                    </svg>
+                    Propiedad Intelectual
+                </h2>
+                <ul class="list-disc ml-6 text-gray-700 space-y-2">
+                    <li>El algoritmo de IA heurística y la base de datos son propiedad de PhishShield</li>
+                    <li>Puede utilizar nuestra API según los términos de nuestra <a href="/api-rest" class="text-blue-600 hover:text-blue-800 underline">documentación API</a></li>
+                    <li>No está permitida la extracción masiva de datos sin autorización</li>
+                    <li>Los informes generados pueden ser utilizados con atribución apropiada</li>
+                </ul>
+            </section>
+
+            <!-- Sección 5 -->
+            <section class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-red-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                    </svg>
+                    Cumplimiento Legal
+                </h2>
+                <div class="space-y-4 text-gray-700">
+                    <p>Al usar PhishShield, usted se compromete a:</p>
+                    <ul class="list-disc ml-6 space-y-2">
+                        <li>Cumplir con todas las leyes locales aplicables en materia de ciberseguridad</li>
+                        <li>Respetar los derechos de propiedad intelectual</li>
+                        <li>No utilizar el servicio para actividades ilegales</li>
+                        <li>Reportar vulnerabilidades encontradas mediante nuestro <a href="/security" class="text-blue-600 hover:text-blue-800 underline">programa de seguridad</a></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Contacto -->
+            <section class="bg-blue-50 rounded-xl p-6 text-center">
+                <h3 class="text-xl font-semibold text-blue-800 mb-2">¿Tienes dudas sobre estos términos?</h3>
+                <p class="text-blue-700 mb-4">Contáctanos en <a href="mailto:legal@phishshield.com" class="font-semibold underline">legal@phishshield.com</a></p>
+                <p class="text-blue-600 text-sm">Revisamos y actualizamos nuestros términos regularmente para mantener la transparencia y seguridad de todos.</p>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // JavaScript para mostrar la fecha actual sin necesidad de backend
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const formattedDate = today.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            document.getElementById('current-date').textContent = formattedDate;
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishShield - Panel de Estadísticas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%);
+        }
+        
+        .nav-link {
+            font-size: 1.125rem;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .nav-link {
+                font-size: 1rem;
+                padding: 0.4rem 1rem;
+            }
+        }
+        
+        .stats-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .risk-low { border-left: 4px solid #10b981; }
+        .risk-medium { border-left: 4px solid #f59e0b; }
+        .risk-high { border-left: 4px solid #ef4444; }
+        .risk-critical { border-left: 4px solid #7c3aed; }
+        
+        .loader {
+            border-top-color: #3b82f6;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Estilos para contenedores de gráficos con scroll */
+        .chart-container {
+            position: relative;
+            height: 250px;
+            min-width: 500px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .chart-container:hover {
+            transform: scale(1.02);
+        }
+        
+        .chart-scroll-wrapper {
+            overflow-x: auto;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+        }
+        
+        /* Personalizar la barra de scroll */
+        .chart-scroll-wrapper::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .chart-scroll-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .chart-scroll-wrapper::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        .chart-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* Mejoras para la tabla */
+        .url-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .url-table th {
+            position: sticky;
+            top: 0;
+            background-color: #f9fafb;
+            z-index: 10;
+        }
+        
+        .url-table tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+        
+        .url-table tr:hover {
+            background-color: #f3f4f6;
+        }
+        
+        /* Modal para gráficos expandidos - MEJORADO */
+        .chart-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .chart-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .chart-modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            width: 85vw;
+            height: 85vh;
+            position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chart-modal.active .chart-modal-content {
+            transform: scale(1);
+        }
+        
+        .chart-modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+            z-index: 10;
+        }
+        
+        .chart-modal-close:hover {
+            color: #374151;
+        }
+        
+        .chart-modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+        
+        .chart-modal-canvas-container {
+            position: relative;
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Asegurar que el canvas ocupe el espacio disponible */
+        .chart-modal-canvas-container canvas {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto !important;
+            height: auto !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar -->
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                <i data-feather="bar-chart-2" class="w-8 h-8"></i>
+                <span class="text-xl font-bold">PhishShield Analytics</span>
+            </div>
+            
+            <div class="flex space-x-2 md:space-x-4 justify-center w-full md:w-auto">
+                <a href="/" class="nav-link text-center">Inicio</a>
+                <a href="#" class="nav-link text-center bg-blue-700 bg-opacity-50">Estadísticas</a>
+            </div>
+            
+            <div class="flex items-center mt-4 md:mt-0">
+                <button onclick="refreshAll()" class="bg-white text-blue-800 px-4 py-2 rounded-lg font-medium hover:bg-blue-100 transition">
+                    <i data-feather="refresh-cw" class="inline mr-1 w-4 h-4"></i> Actualizar
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Filtros -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Filtros</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha inicial</label>
+                    <input type="date" id="start-date" class="w-full p-2 border border-gray-300 rounded-md">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha final</label>
+                    <input type="date" id="end-date" class="w-full p-2 border border-gray-300 rounded-md">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nivel de riesgo</label>
+                    <select id="risk-level" class="w-full p-2 border border-gray-300 rounded-md">
+                        <option value="all">Todos</option>
+                        <option value="0-2">Seguro (0-2)</option>
+                        <option value="3-4">Bajo riesgo (3-4)</option>
+                        <option value="5-7">Riesgo (5-7)</option>
+                        <option value="8-10">Malicioso (8-10)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                    <select id="malicious-type" class="w-full p-2 border border-gray-300 rounded-md">
+                        <option value="all">Todos</option>
+                        <option value="safe">Seguros</option>
+                        <option value="malicious">Maliciosos</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Motor de Detección</label>
+                    <select id="detection-engine" class="w-full p-2 border border-gray-300 rounded-md">
+                        <option value="all">Todos</option>
+                        <option value="seguro">Seguro</option>
+                        <option value="heurístico">Heurístico</option>
+                        <option value="virustotal">VirusTotal</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-4 flex justify-end">
+                <button id="apply-filters" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium">
+                    Aplicar Filtros
+                </button>
+                <button id="reset-filters" class="ml-2 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md font-medium">
+                    Restablecer
+                </button>
+            </div>
+        </div>
+
+        <!-- Estadísticas generales -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="stats-card bg-white rounded-xl shadow-sm p-6 risk-low">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-lg bg-green-100 mr-4">
+                        <i data-feather="check-circle" class="text-green-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">URLs Seguras</p>
+                        <h3 id="safe-count" class="text-2xl font-bold">0</h3>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-card bg-white rounded-xl shadow-sm p-6 risk-high">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-lg bg-red-100 mr-4">
+                        <i data-feather="x-circle" class="text-red-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">URLs Maliciosas</p>
+                        <h3 id="malicious-count" class="text-2xl font-bold">0</h3>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-card bg-white rounded-xl shadow-sm p-6 risk-medium">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-lg bg-yellow-100 mr-4">
+                        <i data-feather="alert-circle" class="text-yellow-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Riesgo Promedio</p>
+                        <h3 id="avg-risk" class="text-2xl font-bold">0.0</h3>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-card bg-white rounded-xl shadow-sm p-6 risk-critical">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-lg bg-purple-100 mr-4">
+                        <i data-feather="database" class="text-purple-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Total Analizadas</p>
+                        <h3 id="total-count" class="text-2xl font-bold">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold mb-4">Distribución por Nivel de Riesgo</h3>
+                <div class="chart-scroll-wrapper">
+                    <div class="chart-container" id="risk-chart-container">
+                        <canvas id="riskChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold mb-4">Detecciones por Fuente</h3>
+                <div class="chart-scroll-wrapper">
+                    <div class="chart-container" id="source-chart-container">
+                        <canvas id="sourceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- URLs Recientes -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">URLs Analizadas Recientemente</h2>
+                <button id="export-data" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                    <i data-feather="download" class="inline mr-1 w-4 h-4"></i> Exportar Datos
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="url-table min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
+                            <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dominio</th>
+                            <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                            <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Riesgo</th>
+                            <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                            <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Motor de Detección</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-urls" class="bg-white divide-y divide-gray-200">
+                        <!-- Los datos se llenarán con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-4 flex justify-between items-center">
+                <div class="text-sm text-gray-500" id="pagination-info">Mostrando 0 resultados</div>
+                <div class="flex space-x-2">
+                    <button id="prev-page" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded text-sm font-medium disabled:opacity-50" disabled>
+                        Anterior
+                    </button>
+                    <button id="next-page" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded text-sm font-medium disabled:opacity-50" disabled>
+                        Siguiente
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal para gráficos expandidos - MEJORADO -->
+    <div id="chart-modal" class="chart-modal">
+        <div class="chart-modal-content">
+            <button id="chart-modal-close" class="chart-modal-close">
+                <i data-feather="x"></i>
+            </button>
+            <h3 id="chart-modal-title" class="chart-modal-title"></h3>
+            <div class="chart-modal-canvas-container">
+                <canvas id="chart-modal-canvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p>© 2025 PhishShield Analytics. Todos los derechos reservados.</p>
+            <ul class="mt-4 flex flex-wrap justify-center gap-4">
+                <li><a href="/docs" class="text-gray-400 hover:text-white transition">Documentación</a></li>
+                <li><a href="/api-rest" class="text-gray-400 hover:text-white transition">API REST</a></li>
+                <li><a href="/stats" class="text-gray-400 hover:text-white transition">Estadísticas</a></li>
+                <li><a href="/blog" class="text-gray-400 hover:text-white transition">Blog</a></li>
+                <li><a href="/terms" class="text-gray-400 hover:text-white transition">Términos</a></li>
+                <li><a href="/privacy" class="text-gray-400 hover:text-white transition">Privacidad</a></li>
+                <li><a href="/security" class="text-gray-400 hover:text-white transition">Seguridad</a></li>
+                <li><a href="/gdpr" class="text-gray-400 hover:text-white transition">GDPR</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script>
+        // Inicialización
+        feather.replace();
+        
+        // Variables globales
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let allData = [];
+        let filteredData = [];
+        
+        // Elementos del DOM
+        const safeCountElement = document.getElementById('safe-count');
+        const maliciousCountElement = document.getElementById('malicious-count');
+        const avgRiskElement = document.getElementById('avg-risk');
+        const totalCountElement = document.getElementById('total-count');
+        const recentUrlsElement = document.getElementById('recent-urls');
+        const paginationInfoElement = document.getElementById('pagination-info');
+        const prevPageButton = document.getElementById('prev-page');
+        const nextPageButton = document.getElementById('next-page');
+        const applyFiltersButton = document.getElementById('apply-filters');
+        const resetFiltersButton = document.getElementById('reset-filters');
+        const exportDataButton = document.getElementById('export-data');
+        
+        // Elementos del modal
+        const chartModal = document.getElementById('chart-modal');
+        const chartModalClose = document.getElementById('chart-modal-close');
+        const chartModalTitle = document.getElementById('chart-modal-title');
+        const chartModalCanvas = document.getElementById('chart-modal-canvas');
+        
+        // Charts
+        let riskChart = null;
+        let sourceChart = null;
+        let expandedChart = null;
+        
+        // Función para actualizar todos los datos
+        function refreshAll() {
+            loadStatsData();
+            loadRecentURLs();
+        }
+        
+        // Cargar datos al iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStatsData();
+            loadRecentURLs();
+            setupEventListeners();
+            
+            // Establecer fechas por defecto (últimos 30 días)
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - 30);
+            
+            document.getElementById('end-date').value = endDate.toISOString().split('T')[0];
+            document.getElementById('start-date').value = startDate.toISOString().split('T')[0];
+        });
+        
+        // Configurar event listeners
+        function setupEventListeners() {
+            applyFiltersButton.addEventListener('click', applyFilters);
+            resetFiltersButton.addEventListener('click', resetFilters);
+            prevPageButton.addEventListener('click', () => changePage(-1));
+            nextPageButton.addEventListener('click', () => changePage(1));
+            exportDataButton.addEventListener('click', exportData);
+            
+            // Event listeners para el modal
+            chartModalClose.addEventListener('click', closeChartModal);
+            chartModal.addEventListener('click', (e) => {
+                if (e.target === chartModal) {
+                    closeChartModal();
+                }
+            });
+            
+            // Event listener para tecla Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && chartModal.classList.contains('active')) {
+                    closeChartModal();
+                }
+            });
+            
+            // Event listeners para expandir gráficos
+            document.getElementById('risk-chart-container').addEventListener('click', () => expandChart('risk'));
+            document.getElementById('source-chart-container').addEventListener('click', () => expandChart('source'));
+        }
+        
+        // Cargar datos estadísticos
+        async function loadStatsData() {
+            try {
+                const startDate = document.getElementById('start-date').value;
+                const endDate = document.getElementById('end-date').value;
+                
+                let url = '/api/stats';
+                if (startDate && endDate) {
+                    url += `?start_date=${startDate}&end_date=${endDate}`;
+                }
+                
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Error al cargar estadísticas');
+                }
+                
+                const data = await response.json();
+                updateStatsUI(data);
+                createCharts(data);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar los datos estadísticos: ' + error.message);
+            }
+        }
+        
+        // Cargar URLs recientes
+        async function loadRecentURLs() {
+            try {
+                const startDate = document.getElementById('start-date').value;
+                const endDate = document.getElementById('end-date').value;
+                
+                let url = '/api/urls';
+                if (startDate && endDate) {
+                    url += `?start_date=${startDate}&end_date=${endDate}`;
+                }
+                
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Error al cargar URLs');
+                }
+                
+                const data = await response.json();
+                allData = data.urls || [];
+                filteredData = [...allData];
+                renderTable();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al cargar las URLs: ' + error.message);
+            }
+        }
+        
+        // Actualizar la UI con las estadísticas
+        function updateStatsUI(data) {
+            const safeUrls = (data.total_unique_urls || 0) - (data.ever_malicious_urls || 0);
+    
+            safeCountElement.textContent = safeUrls;
+            maliciousCountElement.textContent = data.ever_malicious_urls || 0;
+            avgRiskElement.textContent = (data.avg_risk || 0).toFixed(1);
+            totalCountElement.textContent = data.total_unique_urls || 0;
+        }
+        
+        // Crear gráficos
+        function createCharts(data) {
+            // Gráfico de distribución de riesgo
+            const riskCtx = document.getElementById('riskChart').getContext('2d');
+            if (riskChart) {
+                riskChart.destroy();
+            }
+            
+            riskChart = new Chart(riskCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Seguro (0-2)', 'Bajo riesgo (3-4)', 'Riesgo (5-7)', 'Malicioso (8-10)'],
+                    datasets: [{
+                        data: data.risk_distribution || [0, 0, 0, 0],
+                        backgroundColor: [
+                            '#10b981',
+                            '#f59e0b',
+                            '#ef4444',
+                            '#7c3aed'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de detecciones por fuente
+            const sourceCtx = document.getElementById('sourceChart').getContext('2d');
+            if (sourceChart) {
+                sourceChart.destroy();
+            }
+            
+            sourceChart = new Chart(sourceCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['VirusTotal', 'Heurístico'],
+                    datasets: [{
+                        label: 'Detecciones',
+                        data: data.source_detections || [0, 0],
+                        backgroundColor: ['#3b82f6', '#f59e0b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#000000',
+                                generateLabels: function(chart) {
+                                    const original = Chart.defaults.plugins.legend.labels.generateLabels;
+                                    const labels = original.call(this, chart);
+                                    
+                                    if (labels.length > 0) {
+                                        labels[0].fillStyle = '#ef4444';
+                                        labels[0].strokeStyle = '#ef4444';
+                                    }
+                                    return labels;
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Expandir gráfico en modal - COMPLETAMENTE MEJORADO
+        function expandChart(chartType) {
+            let chartData, title;
+            
+            if (chartType === 'risk') {
+                chartData = JSON.parse(JSON.stringify(riskChart.data));
+                title = 'Distribución por Nivel de Riesgo';
+            } else if (chartType === 'source') {
+                chartData = JSON.parse(JSON.stringify(sourceChart.data));
+                title = 'Detecciones por Fuente';
+            }
+            
+            // Actualizar título del modal
+            chartModalTitle.textContent = title;
+            
+            // Destruir gráfico anterior si existe
+            if (expandedChart) {
+                expandedChart.destroy();
+            }
+            
+            // Crear nuevo gráfico en el modal con opciones optimizadas
+            const ctx = chartModalCanvas.getContext('2d');
+            
+            // Configuración común para ambos tipos de gráficos
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: chartType === 'risk' ? 'right' : 'top',
+                        labels: {
+                            font: {
+                                size: 16
+                            },
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                if (chartType === 'risk') {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                } else {
+                                    return `${context.dataset.label}: ${context.raw}`;
+                                }
+                            }
+                        },
+                        bodyFont: {
+                            size: 14
+                        },
+                        titleFont: {
+                            size: 16
+                        }
+                    }
+                },
+                layout: {
+                    padding: {
+                        left: 20,
+                        right: 20,
+                        top: 20,
+                        bottom: 20
+                    }
+                }
+            };
+            
+            // Configuración específica para gráfico de barras
+            if (chartType === 'source') {
+                commonOptions.scales = {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            font: {
+                                size: 14
+                            },
+                            precision: 0
+                        },
+                        title: {
+                            display: true,
+                            text: 'Cantidad de Detecciones',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: {
+                                size: 14
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Fuente de Detección',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    }
+                };
+            }
+            
+            expandedChart = new Chart(ctx, {
+                type: chartType === 'risk' ? 'doughnut' : 'bar',
+                data: chartData,
+                options: commonOptions
+            });
+            
+            // Mostrar modal
+            chartModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Forzar redibujado del gráfico para adaptarse al nuevo tamaño
+            setTimeout(() => {
+                if (expandedChart) {
+                    expandedChart.resize();
+                }
+            }, 100);
+        }
+        
+        // Cerrar modal de gráfico
+        function closeChartModal() {
+            chartModal.classList.remove('active');
+            document.body.style.overflow = '';
+            
+            // Destruir gráfico expandido después de la transición
+            setTimeout(() => {
+                if (expandedChart) {
+                    expandedChart.destroy();
+                    expandedChart = null;
+                }
+            }, 300);
+        }
+        
+        // Aplicar filtros
+        function applyFilters() {
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const riskLevel = document.getElementById('risk-level').value;
+            const maliciousType = document.getElementById('malicious-type').value;
+            const detectionEngine = document.getElementById('detection-engine').value;
+            
+            filteredData = allData.filter(item => {
+                // Filtrar por fecha
+                if (startDate && item.date && item.date < startDate) return false;
+                if (endDate && item.date && item.date > endDate) return false;
+                
+                // Filtrar por nivel de riesgo
+                if (riskLevel !== 'all') {
+                    const [min, max] = riskLevel.split('-').map(Number);
+                    const riskScore = item.risk_score || 0;
+                    if (riskScore < min || riskScore > max) return false;
+                }
+                
+                // Filtrar por tipo (malicioso o seguro)
+                if (maliciousType !== 'all') {
+                    const isMalicious = item.is_malicious || false;
+                    if (maliciousType === 'malicious' && !isMalicious) return false;
+                    if (maliciousType === 'safe' && isMalicious) return false;
+                }
+                
+                // Filtrar por motor de detección
+                if (detectionEngine !== 'all') {
+                    const riskScore = item.risk_score || 0;
+                    let engine = '';
+                    
+                    if (riskScore >= 0 && riskScore <= 2) {
+                        engine = 'seguro';
+                    } else if (riskScore >= 3 && riskScore <= 7) {
+                        engine = 'heurístico';
+                    } else if (riskScore >= 8 && riskScore <= 10) {
+                        engine = 'virustotal';
+                    }
+                    
+                    if (engine !== detectionEngine) return false;
+                }
+                
+                return true;
+            });
+            
+            currentPage = 1;
+            renderTable();
+        }
+        
+        // Restablecer filtros
+        function resetFilters() {
+            document.getElementById('start-date').value = '';
+            document.getElementById('end-date').value = '';
+            document.getElementById('risk-level').value = 'all';
+            document.getElementById('malicious-type').value = 'all';
+            document.getElementById('detection-engine').value = 'all';
+            
+            filteredData = [...allData];
+            currentPage = 1;
+            renderTable();
+        }
+        
+        // Renderizar tabla
+        function renderTable() {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageData = filteredData.slice(startIndex, endIndex);
+            
+            // Actualizar información de paginación
+            paginationInfoElement.textContent = `Mostrando ${startIndex + 1}-${Math.min(endIndex, filteredData.length)} de ${filteredData.length} resultados`;
+            
+            // Habilitar/deshabilitar botones de paginación
+            prevPageButton.disabled = currentPage === 1;
+            nextPageButton.disabled = endIndex >= filteredData.length;
+            
+            // Limpiar tabla
+            recentUrlsElement.innerHTML = '';
+            
+            // Llenar tabla con datos
+            if (pageData.length === 0) {
+                recentUrlsElement.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-4 py-4 text-center text-gray-500">
+                            No se encontraron resultados con los filtros aplicados
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            pageData.forEach(item => {
+                const row = document.createElement('tr');
+                
+                // Determinar clases de riesgo
+                let riskClass = '';
+                let riskText = '';
+
+                if (item.risk_score >= 8) {
+                    riskClass = 'text-red-600 font-semibold';
+                    riskText = 'Malicioso';
+                } else if (item.risk_score >= 5) {
+                    riskClass = 'text-orange-600 font-semibold';
+                    riskText = 'Riesgo';
+                } else if (item.risk_score >= 3) {
+                    riskClass = 'text-yellow-600 font-semibold';
+                    riskText = 'Bajo riesgo';
+                } else {
+                    riskClass = 'text-green-600';
+                    riskText = 'Seguro';
+                }
+                
+                // Acortar URL si es muy larga
+                const url = item.url || '';
+                const displayUrl = url.length > 50 ? url.substring(0, 47) + '...' : url;
+                const domain = item.domain || 'N/A';
+                const date = item.date || item.analysis_date || 'N/A';
+                const riskScore = item.risk_score || 0;
+
+                row.innerHTML = `
+                    <td class="px-4 py-4 text-sm font-medium text-gray-900" title="${url}">${displayUrl}</td>
+                    <td class="px-4 py-4 text-sm text-gray-500">${domain}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(date)}</td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm ${riskClass}">${riskScore} (${riskText})</td>
+                    <td class="px-4 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.is_malicious ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}">
+                            ${item.is_malicious ? 'Malicioso' : 'Seguro'}
+                        </span>
+                    </td>
+                    <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${getDetectionEngine(item)}
+                    </td>
+                `;
+                
+                recentUrlsElement.appendChild(row);
+            });
+        }
+        
+        // Función para determinar el motor de detección
+        function getDetectionEngine(item) {
+            const riskScore = item.risk_score || 0;
+            
+            if (riskScore >= 0 && riskScore <= 2) {
+                return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Seguro</span>';
+            } else if (riskScore >= 3 && riskScore <= 9) {
+                return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Heurístico</span>';
+            } else if (riskScore == 10) {
+                return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">VirusTotal</span>';
+            } else {
+                return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Desconocido</span>';
+            }
+        }
+
+        // Cambiar página
+        function changePage(direction) {
+            const newPage = currentPage + direction;
+            const maxPage = Math.ceil(filteredData.length / itemsPerPage);
+            
+            if (newPage >= 1 && newPage <= maxPage) {
+                currentPage = newPage;
+                renderTable();
+            }
+        }
+        
+        // Exportar datos
+        function exportData() {
+            const dataStr = JSON.stringify(filteredData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `phishshield-data-${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+        
+        // Formatear fecha
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-ES', options);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block title %}Política de Privacidad | PhishShield{% endblock %}
+{% block content %}
+    <main class="flex-grow container mx-auto px-4 py-12 max-w-4xl">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-4 text-blue-800">Política de Privacidad</h1>
+            <p class="text-gray-600 text-lg">Última actualización: <span id="current-date"></span></p>
+        </div>
+
+        <div class="space-y-8">
+            <!-- Sección 1 -->
+            <section class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-blue-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    Protección de Datos
+                </h2>
+                <p class="text-gray-700 mb-4">En PhishShield nos comprometemos a proteger tu privacidad y los datos que procesamos. Somos transparentes sobre qué información recopilamos y cómo la utilizamos.</p>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-blue-800 mb-2">🔒 Nuestro Compromiso</h3>
+                    <ul class="list-disc ml-6 text-blue-700 space-y-1">
+                        <li>Minimizamos la recopilación de datos al máximo necesario</li>
+                        <li>No vendemos ni compartimos datos personales con terceros</li>
+                        <li>Implementamos medidas de seguridad avanzadas</li>
+                        <li>Cumplimos con las regulaciones de protección de datos</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Sección 2 -->
+            <section class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-green-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                    </svg>
+                    Datos que Recopilamos
+                </h2>
+                <div class="space-y-4">
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-green-800 mb-2">📊 Datos Técnicos (Anónimos)</h3>
+                        <ul class="list-disc ml-6 text-green-700 space-y-1">
+                            <li><strong>URLs analizadas</strong> y resultados de seguridad</li>
+                            <li><strong>Características técnicas</strong> de las URLs (dominio, protocolo, etc.)</li>
+                            <li><strong>Métadatos de análisis</strong> (fecha, hora, puntuación de riesgo)</li>
+                            <li><strong>Estadísticas agregadas</strong> para mejorar nuestros algoritmos</li>
+                        </ul>
+                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-yellow-800 mb-2">🚫 Lo que NO Recopilamos</h3>
+                        <ul class="list-disc ml-6 text-yellow-700 space-y-1">
+                            <li>Información personal identificable (nombre, email, etc.)</li>
+                            <li>Direcciones IP (las anonimizamos)</li>
+                            <li>Datos de navegación o cookies de seguimiento</li>
+                            <li>Contenido de las páginas web analizadas</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 3 -->
+            <section class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-purple-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9m0 0v12m0 0h6m-6 0h6"/>
+                    </svg>
+                    Uso de la Información
+                </h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-purple-800 mb-2">🎯 Propósitos Principales</h3>
+                        <ul class="list-disc ml-6 text-purple-700 space-y-2">
+                            <li>Mejorar la detección de amenazas con IA</li>
+                            <li>Entrenar nuestros algoritmos heurísticos</li>
+                            <li>Generar estadísticas anónimas de seguridad</li>
+                            <li>Optimizar el rendimiento del servicio</li>
+                        </ul>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-blue-800 mb-2">🛡️ Beneficios de Seguridad</h3>
+                        <ul class="list-disc ml-6 text-blue-700 space-y-2">
+                            <li>Crear patrones de detección más precisos</li>
+                            <li>Identificar nuevas tendencias de phishing</li>
+                            <li>Proteger a toda la comunidad de usuarios</li>
+                            <li>Contribuir a la investigación en ciberseguridad</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 4 -->
+            <section class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-red-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    Seguridad y Almacenamiento
+                </h2>
+                <div class="space-y-4 text-gray-700">
+                    <div class="bg-red-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-red-800 mb-2">🔐 Medidas de Seguridad</h4>
+                        <ul class="list-disc ml-6 text-red-700 space-y-2">
+                            <li><strong>Base de datos normalizada</strong> con información separada</li>
+                            <li><strong>Hashing de URLs</strong> para proteger la información</li>
+                            <li><strong>Eliminación periódica</strong> de datos antiguos</li>
+                            <li><strong>Acceso restringido</strong> solo a personal autorizado</li>
+                            <li><strong>Encriptación</strong> de datos sensibles</li>
+                        </ul>
+                    </div>
+                    <p class="text-gray-600"><strong>Período de retención:</strong> Los datos de análisis se conservan por máximo 12 meses para fines de investigación, después se eliminan automáticamente.</p>
+                </div>
+            </section>
+
+            <!-- Sección 5 -->
+            <section class="bg-white rounded-xl shadow-lg p-8 border-l-4 border-teal-500">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Tus Derechos
+                </h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-teal-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-teal-800 mb-2">📋 Derechos del Usuario</h3>
+                        <ul class="list-disc ml-6 text-teal-700 space-y-2">
+                            <li>Acceso a información sobre tus análisis</li>
+                            <li>Solicitar la eliminación de datos específicos</li>
+                            <li>Obtener explicación sobre el procesamiento</li>
+                            <li>Exportar datos en formatos estándar</li>
+                        </ul>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h3 class="font-semibold text-green-800 mb-2">📝 Cómo Ejercerlos</h3>
+                        <ul class="list-disc ml-6 text-green-700 space-y-2">
+                            <li>Contacta a nuestro delegado de protección de datos</li>
+                            <li>Proporciona la URL específica que quieres gestionar</li>
+                            <li>Responderemos en un plazo máximo de 30 días</li>
+                            <li>Servicio completamente gratuito</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contacto -->
+            <section class="bg-blue-50 rounded-xl p-6 text-center">
+                <h3 class="text-xl font-semibold text-blue-800 mb-2">¿Preguntas sobre Privacidad?</h3>
+                <p class="text-blue-700 mb-4">Contáctanos en <a href="mailto:privacy@phishshield.com" class="font-semibold underline">privacy@phishshield.com</a></p>
+                <p class="text-blue-600 text-sm">También puedes consultar nuestra <a href="/gdpr" class="underline">política GDPR</a> para usuarios europeos.</p>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // JavaScript para mostrar la fecha actual
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const formattedDate = today.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            document.getElementById('current-date').textContent = formattedDate;
+        });
+    </script>
+{% endblock %}
