@@ -556,6 +556,67 @@
         });
         feather.replace();
 
+        // Función para mostrar notificaciones con diseño premium (reemplaza alert)
+        function showNotification(message, type = 'error') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            
+            let bgClass, borderClass, textClass, iconColor, iconName;
+            if (type === 'success') {
+                bgClass = 'bg-green-50/95';
+                borderClass = 'border-green-200';
+                textClass = 'text-green-800';
+                iconColor = 'text-green-500';
+                iconName = 'check-circle';
+            } else if (type === 'warning') {
+                bgClass = 'bg-yellow-50/95';
+                borderClass = 'border-yellow-200';
+                textClass = 'text-yellow-800';
+                iconColor = 'text-yellow-500';
+                iconName = 'alert-circle';
+            } else { // error
+                bgClass = 'bg-red-50/95';
+                borderClass = 'border-red-200';
+                textClass = 'text-red-800';
+                iconColor = 'text-red-500';
+                iconName = 'x-circle';
+            }
+
+            toast.className = `flex items-start p-4 rounded-xl border ${bgClass} ${borderClass} shadow-xl backdrop-blur-sm transition-all duration-300 transform translate-y-4 opacity-0 pointer-events-auto`;
+            
+            toast.innerHTML = `
+                <div class="flex-shrink-0 mr-3">
+                    <i data-feather="${iconName}" class="${iconColor} w-5 h-5"></i>
+                </div>
+                <div class="flex-1 text-sm font-medium ${textClass}">
+                    ${message}
+                </div>
+                <button class="flex-shrink-0 ml-3 text-gray-400 hover:text-gray-600 transition-colors" onclick="this.parentElement.remove()">
+                    <i data-feather="x" class="w-4 h-4"></i>
+                </button>
+            `;
+
+            container.appendChild(toast);
+            feather.replace();
+
+            // Activar animación de entrada
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            });
+
+            // Remover automáticamente después de 5 segundos
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 5000);
+        }
+
         // Elementos del DOM
         const urlForm = document.getElementById('url-form');
         const urlInput = document.getElementById('url-input');
@@ -684,11 +745,23 @@
                     body: JSON.stringify({ url })
                 });
                 
+                let data;
                 if (!response.ok) {
-                    throw new Error('Error en la respuesta de VirusTotal');
+                    let errorMessage = 'Error en la respuesta de VirusTotal';
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.error || errorMessage;
+                    } catch (e) {
+                        errorMessage = `Error ${response.status}: ${response.statusText || 'Error del servidor'}`;
+                    }
+                    throw new Error(errorMessage);
                 }
                 
-                const data = await response.json();
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    throw new Error('La respuesta de VirusTotal no tiene un formato válido.');
+                }
                 
                 // Si el análisis está en proceso
                 if (data.status === 'processing') {
@@ -1133,7 +1206,7 @@
             
             // Validación (código existente)
             if (!url) {
-                alert('Por favor, introduce una URL');
+                showNotification('Por favor, introduce una URL', 'warning');
                 return;
             }
             
@@ -1144,7 +1217,7 @@
             try {
                 new URL(url);
             } catch (error) {
-                alert('Por favor, introduce una URL válida. Ejemplo: ejemplo.com');
+                showNotification('Por favor, introduce una URL válida. Ejemplo: ejemplo.com', 'warning');
                 return;
             }
             
@@ -1168,12 +1241,23 @@
                 });
                 
                 // Verificar si la respuesta es exitosa
+                let data;
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Error del servidor');
+                    let errorMessage = 'Error del servidor';
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.error || errorMessage;
+                    } catch (e) {
+                        errorMessage = `Error ${response.status}: ${response.statusText || 'Error del servidor'}`;
+                    }
+                    throw new Error(errorMessage);
                 }
                 
-                const data = await response.json();
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    throw new Error('La respuesta del servidor no tiene un formato válido.');
+                }
                 
                 // Verificar si hay error en la respuesta
                 if (data.error) {
@@ -1194,7 +1278,7 @@
                 // Ocultar loading después de un breve delay para que se vea el estado actual
                 setTimeout(() => {
                     loadingSection.classList.add('hidden');
-                    alert('Error al analizar la URL: ' + error.message);
+                    showNotification('Error al analizar la URL: ' + error.message, 'error');
                 }, 500);
             } finally {
                 // Ocultar sección de carga después de un breve delay
@@ -1231,7 +1315,7 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al cargar URLs seguras');
+                showNotification('Error al cargar URLs seguras', 'error');
             }
         }
 
@@ -1261,37 +1345,7 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al cargar URLs maliciosas');
-            }
-        }
-
-        // Función para cargar URLs maliciosas del historial
-        async function loadMaliciousUrls() {
-            const safeList = document.getElementById('safe-urls-list');
-            const maliciousList = document.getElementById('malicious-urls-list');
-            
-            // Ocultar lista segura si está abierta
-            safeList.classList.add('hidden');
-            
-            // Si ya está cargada, solo toggle
-            if (maliciousList.innerHTML && !maliciousList.classList.contains('hidden')) {
-                maliciousList.classList.add('hidden');
-                return;
-            }
-            
-            try {
-                const response = await fetch('/api/urls');
-                if (!response.ok) throw new Error('Error al cargar historial');
-                
-                const data = await response.json();
-                const maliciousUrls = data.urls.filter(url => url.is_malicious);
-                
-                displayUrlList(maliciousUrls, 'malicious-urls-list', 'red');
-                maliciousList.classList.remove('hidden');
-                
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al cargar URLs maliciosas');
+                showNotification('Error al cargar URLs maliciosas', 'error');
             }
         }
 
@@ -1372,5 +1426,7 @@
         });
 
     </script>
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full px-4 md:px-0 pointer-events-none"></div>
 </body>
 </html>

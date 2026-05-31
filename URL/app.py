@@ -1,3 +1,11 @@
+import sys
+# Configurar codificación UTF-8 para evitar errores con emojis en Windows y otras plataformas
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
+except AttributeError:
+    pass
+
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import requests
@@ -10,6 +18,7 @@ import hashlib
 import base64
 import os
 from dotenv import load_dotenv
+
 
 # Cargar variables de entorno
 load_dotenv()
@@ -644,135 +653,144 @@ def get_url_history():
 @app.route('/api/stats')
 def get_stats():
     """Obtiene estadísticas generales de la nueva estructura"""
-    conn = sqlite3.connect('url_analyzer.db')
-    cursor = conn.cursor()
-    
-    # URLs únicas analizadas (esto está bien)
-    cursor.execute('SELECT COUNT(*) FROM urls')
-    total_unique_urls = cursor.fetchone()[0]
-    
-    # Total de análisis realizados (esto está bien)
-    cursor.execute('SELECT COUNT(*) FROM url_analyses')
-    total_analyses = cursor.fetchone()[0]
-    
-    # URLs que han sido maliciosas al menos una vez (esto está bien)
-    cursor.execute('''
-        SELECT COUNT(DISTINCT u.id) 
-        FROM urls u 
-        JOIN url_analyses ua ON u.id = ua.url_id 
-        WHERE ua.is_malicious = 1
-    ''')
-    ever_malicious_urls = cursor.fetchone()[0]
-    
-    # Análisis maliciosos (esto está bien)
-    cursor.execute('SELECT COUNT(*) FROM url_analyses WHERE is_malicious = 1')
-    malicious_analyses = cursor.fetchone()[0]
-    
-    # Promedio de riesgo (esto está bien)
-    cursor.execute('SELECT AVG(risk_score) FROM url_analyses')
-    avg_risk = cursor.fetchone()[0] or 0
-    
-    # Distribución de riesgo (basada en el ÚLTIMO análisis de cada URL)
-    risk_distribution = [0, 0, 0, 0]  # seguro, bajo riesgo, riesgo, malicioso
-    cursor.execute('''
-        SELECT ua.risk_score 
-        FROM url_analyses ua
-        JOIN (
-            SELECT url_id, MAX(analysis_date) as latest_date
-            FROM url_analyses
-            GROUP BY url_id
-        ) latest ON ua.url_id = latest.url_id AND ua.analysis_date = latest.latest_date
-    ''')
-    latest_scores = cursor.fetchall()
-    for score in latest_scores:
-        risk_score = score[0]
-        if risk_score <= 2:
-            risk_distribution[0] += 1
-        elif risk_score <= 4:
-            risk_distribution[1] += 1
-        elif risk_score <= 7:
-            risk_distribution[2] += 1
-        else:
-            risk_distribution[3] += 1
-    
-    # Detecciones por fuente (basado en el ÚLTIMO análisis de cada URL)
-    source_detections = [0, 0]  # VirusTotal, Heuristic
-    cursor.execute('''
-        SELECT ar.source, COUNT(*) 
-        FROM analysis_results ar
-        JOIN url_analyses ua ON ar.analysis_id = ua.id
-        JOIN (
-            SELECT url_id, MAX(analysis_date) as latest_date
-            FROM url_analyses
-            GROUP BY url_id
-        ) latest ON ua.url_id = latest.url_id AND ua.analysis_date = latest.latest_date
-        WHERE ar.result = 1 
-        GROUP BY ar.source
-    ''')
-    sources = cursor.fetchall()
-    for source in sources:
-        if source[0] == 'VirusTotal':
-            source_detections[0] = source[1]
-        elif source[0] == 'Heuristic':
-            source_detections[1] = source[1]
-    
-    conn.close()
-    
-    return jsonify({
-        'total_unique_urls': total_unique_urls,
-        'total_analyses': total_analyses,
-        'ever_malicious_urls': ever_malicious_urls,
-        'malicious_analyses': malicious_analyses,
-        'avg_risk': avg_risk,
-        'risk_distribution': risk_distribution,
-        'source_detections': source_detections
-    })
+    try:
+        conn = sqlite3.connect('url_analyzer.db')
+        cursor = conn.cursor()
+        
+        # URLs únicas analizadas (esto está bien)
+        cursor.execute('SELECT COUNT(*) FROM urls')
+        total_unique_urls = cursor.fetchone()[0]
+        
+        # Total de análisis realizados (esto está bien)
+        cursor.execute('SELECT COUNT(*) FROM url_analyses')
+        total_analyses = cursor.fetchone()[0]
+        
+        # URLs que han sido maliciosas al menos una vez (esto está bien)
+        cursor.execute('''
+            SELECT COUNT(DISTINCT u.id) 
+            FROM urls u 
+            JOIN url_analyses ua ON u.id = ua.url_id 
+            WHERE ua.is_malicious = 1
+        ''')
+        ever_malicious_urls = cursor.fetchone()[0]
+        
+        # Análisis maliciosos (esto está bien)
+        cursor.execute('SELECT COUNT(*) FROM url_analyses WHERE is_malicious = 1')
+        malicious_analyses = cursor.fetchone()[0]
+        
+        # Promedio de riesgo (esto está bien)
+        cursor.execute('SELECT AVG(risk_score) FROM url_analyses')
+        avg_risk = cursor.fetchone()[0] or 0
+        
+        # Distribución de riesgo (basada en el ÚLTIMO análisis de cada URL)
+        risk_distribution = [0, 0, 0, 0]  # seguro, bajo riesgo, riesgo, malicioso
+        cursor.execute('''
+            SELECT ua.risk_score 
+            FROM url_analyses ua
+            JOIN (
+                SELECT url_id, MAX(analysis_date) as latest_date
+                FROM url_analyses
+                GROUP BY url_id
+            ) latest ON ua.url_id = latest.url_id AND ua.analysis_date = latest.latest_date
+        ''')
+        latest_scores = cursor.fetchall()
+        for score in latest_scores:
+            risk_score = score[0]
+            if risk_score <= 2:
+                risk_distribution[0] += 1
+            elif risk_score <= 4:
+                risk_distribution[1] += 1
+            elif risk_score <= 7:
+                risk_distribution[2] += 1
+            else:
+                risk_distribution[3] += 1
+        
+        # Detecciones por fuente (basado en el ÚLTIMO análisis de cada URL)
+        source_detections = [0, 0]  # VirusTotal, Heuristic
+        cursor.execute('''
+            SELECT ar.source, COUNT(*) 
+            FROM analysis_results ar
+            JOIN url_analyses ua ON ar.analysis_id = ua.id
+            JOIN (
+                SELECT url_id, MAX(analysis_date) as latest_date
+                FROM url_analyses
+                GROUP BY url_id
+            ) latest ON ua.url_id = latest.url_id AND ua.analysis_date = latest.latest_date
+            WHERE ar.result = 1 
+            GROUP BY ar.source
+        ''')
+        sources = cursor.fetchall()
+        for source in sources:
+            if source[0] == 'VirusTotal':
+                source_detections[0] = source[1]
+            elif source[0] == 'Heuristic':
+                source_detections[1] = source[1]
+        
+        conn.close()
+        
+        return jsonify({
+            'total_unique_urls': total_unique_urls,
+            'total_analyses': total_analyses,
+            'ever_malicious_urls': ever_malicious_urls,
+            'malicious_analyses': malicious_analyses,
+            'avg_risk': avg_risk,
+            'risk_distribution': risk_distribution,
+            'source_detections': source_detections
+        })
+    except Exception as e:
+        print(f"❌ Error en get_stats: {e}")
+        return jsonify({'error': 'Error al obtener estadísticas de la base de datos'}), 500
 
 # RUTA ACTUALIZADA: URLs con análisis más reciente
 @app.route('/api/urls')
 def get_urls():
     """Obtiene todas las URLs con su análisis más reciente"""
-    conn = sqlite3.connect('url_analyzer.db')
-    cursor = conn.cursor()
-    
-    # Obtener el análisis más reciente por URL
-    cursor.execute('''
-        SELECT u.url, u.domain, ua.analysis_date, ua.risk_score, ua.is_malicious 
-        FROM urls u
-        JOIN url_analyses ua ON u.id = ua.url_id
-        WHERE ua.analysis_date = (
-            SELECT MAX(analysis_date) 
-            FROM url_analyses 
-            WHERE url_id = u.id
-        )
-        ORDER BY ua.analysis_date DESC
-    ''')
-    
-    urls = []
-    for row in cursor.fetchall():
-        url_data = {
-            'url': row[0],
-            'domain': row[1],
-            'analysis_date': row[2],
-            'risk_score': row[3],
-            'is_malicious': bool(row[4])
-        }
+    try:
+        conn = sqlite3.connect('url_analyzer.db')
+        cursor = conn.cursor()
         
-        # Determinar motor de detección basado en el risk_score
-        risk_score = row[3]
-        if risk_score >= 0 and risk_score <= 2:
-            url_data['detection_engine'] = 'Seguro'
-        elif risk_score >= 3 and risk_score <= 9:
-            url_data['detection_engine'] = 'Heurístico'
-        elif risk_score == 10:
-            url_data['detection_engine'] = 'VirusTotal'
-        else:
-            url_data['detection_engine'] = 'Desconocido'
+        # Obtener el análisis más reciente por URL
+        cursor.execute('''
+            SELECT u.url, u.domain, ua.analysis_date, ua.risk_score, ua.is_malicious 
+            FROM urls u
+            JOIN url_analyses ua ON u.id = ua.url_id
+            WHERE ua.analysis_date = (
+                SELECT MAX(analysis_date) 
+                FROM url_analyses 
+                WHERE url_id = u.id
+            )
+            ORDER BY ua.analysis_date DESC
+        ''')
         
-        urls.append(url_data)
-    
-    conn.close()
-    return jsonify({'urls': urls})
+        urls = []
+        for row in cursor.fetchall():
+            url_data = {
+                'url': row[0],
+                'domain': row[1],
+                'analysis_date': row[2],
+                'risk_score': row[3],
+                'is_malicious': bool(row[4])
+            }
+            
+            # Determinar motor de detección basado en el risk_score
+            risk_score = row[3]
+            if risk_score >= 0 and risk_score <= 2:
+                url_data['detection_engine'] = 'Seguro'
+            elif risk_score >= 3 and risk_score <= 9:
+                url_data['detection_engine'] = 'Heurístico'
+            elif risk_score == 10:
+                url_data['detection_engine'] = 'VirusTotal'
+            else:
+                url_data['detection_engine'] = 'Desconocido'
+            
+            urls.append(url_data)
+        
+        conn.close()
+        return jsonify({'urls': urls})
+    except Exception as e:
+        print(f"❌ Error en get_urls: {e}")
+        return jsonify({'error': 'Error al obtener URLs de la base de datos'}), 500
+
 
 # Rutas para las páginas
 @app.route('/stats')

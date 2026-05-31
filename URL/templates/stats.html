@@ -412,6 +412,67 @@
     <script>
         // Inicialización
         feather.replace();
+
+        // Función para mostrar notificaciones con diseño premium (reemplaza alert)
+        function showNotification(message, type = 'error') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            
+            let bgClass, borderClass, textClass, iconColor, iconName;
+            if (type === 'success') {
+                bgClass = 'bg-green-50/95';
+                borderClass = 'border-green-200';
+                textClass = 'text-green-800';
+                iconColor = 'text-green-500';
+                iconName = 'check-circle';
+            } else if (type === 'warning') {
+                bgClass = 'bg-yellow-50/95';
+                borderClass = 'border-yellow-200';
+                textClass = 'text-yellow-800';
+                iconColor = 'text-yellow-500';
+                iconName = 'alert-circle';
+            } else { // error
+                bgClass = 'bg-red-50/95';
+                borderClass = 'border-red-200';
+                textClass = 'text-red-800';
+                iconColor = 'text-red-500';
+                iconName = 'x-circle';
+            }
+
+            toast.className = `flex items-start p-4 rounded-xl border ${bgClass} ${borderClass} shadow-xl backdrop-blur-sm transition-all duration-300 transform translate-y-4 opacity-0 pointer-events-auto`;
+            
+            toast.innerHTML = `
+                <div class="flex-shrink-0 mr-3">
+                    <i data-feather="${iconName}" class="${iconColor} w-5 h-5"></i>
+                </div>
+                <div class="flex-1 text-sm font-medium ${textClass}">
+                    ${message}
+                </div>
+                <button class="flex-shrink-0 ml-3 text-gray-400 hover:text-gray-600 transition-colors" onclick="this.parentElement.remove()">
+                    <i data-feather="x" class="w-4 h-4"></i>
+                </button>
+            `;
+
+            container.appendChild(toast);
+            feather.replace();
+
+            // Activar animación de entrada
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            });
+
+            // Remover automáticamente después de 5 segundos
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 5000);
+        }
         
         // Variables globales
         let currentPage = 1;
@@ -504,16 +565,28 @@
                 }
                 
                 const response = await fetch(url);
+                let data;
                 if (!response.ok) {
-                    throw new Error('Error al cargar estadísticas');
+                    let errorMessage = 'Error al cargar estadísticas';
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.error || errorMessage;
+                    } catch (e) {
+                        errorMessage = `Error ${response.status}: ${response.statusText || 'Error del servidor'}`;
+                    }
+                    throw new Error(errorMessage);
                 }
                 
-                const data = await response.json();
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    throw new Error('La respuesta del servidor no tiene un formato válido.');
+                }
                 updateStatsUI(data);
                 createCharts(data);
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al cargar los datos estadísticos: ' + error.message);
+                showNotification('Error al cargar los datos estadísticos: ' + error.message, 'error');
             }
         }
         
@@ -529,17 +602,29 @@
                 }
                 
                 const response = await fetch(url);
+                let data;
                 if (!response.ok) {
-                    throw new Error('Error al cargar URLs');
+                    let errorMessage = 'Error al cargar URLs';
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.error || errorMessage;
+                    } catch (e) {
+                        errorMessage = `Error ${response.status}: ${response.statusText || 'Error del servidor'}`;
+                    }
+                    throw new Error(errorMessage);
                 }
                 
-                const data = await response.json();
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    throw new Error('La respuesta del servidor no tiene un formato válido.');
+                }
                 allData = data.urls || [];
                 filteredData = [...allData];
                 renderTable();
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error al cargar las URLs: ' + error.message);
+                showNotification('Error al cargar las URLs: ' + error.message, 'error');
             }
         }
         
@@ -974,5 +1059,7 @@
             return new Date(dateString).toLocaleDateString('es-ES', options);
         }
     </script>
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full px-4 md:px-0 pointer-events-none"></div>
 </body>
 </html>
