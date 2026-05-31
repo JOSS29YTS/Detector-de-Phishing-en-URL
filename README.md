@@ -243,7 +243,12 @@ PhishShield expone un conjunto de endpoints RESTful para integraciones externas:
 
 ## 🌐 Despliegue en la Nube y Demo en Vivo
 
-El proyecto está preparado para ser desplegado fácilmente en plataformas PaaS como **Render**. 
+El proyecto está preparado para ser desplegado fácilmente en plataformas PaaS como **Render**.
+
+### ⚡ Nota de Arranque en Frío (Cold Start) en Render Free Tier
+> [!NOTE]
+> Al estar alojado en la modalidad gratuita de Render, el servidor entra en **estado de reposo (sleep)** automáticamente tras 15 minutos de inactividad. 
+> Cuando visites la Demo en Vivo por primera vez (o tras un periodo sin uso), es posible que la página tarde **aproximadamente de 50 a 90 segundos** en cargarse. Esto es un comportamiento normal de la nube gratuita mientras el contenedor se vuelve a levantar e inicializa la aplicación. Las peticiones y análisis posteriores serán completamente instantáneos.
 
 ### 🛡️ Enfoque de Privacidad por Diseño (Privacy-by-Design)
 
