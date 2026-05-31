@@ -516,120 +516,124 @@ def get_virustotal_data():
 
 @app.route('/analyze', methods=['POST'])
 def analyze_url():
-    data = request.json # Traduce la información del json en un diccionario de python
-    url = data.get('url')
-    
-    if not url:
-        return jsonify({'error': 'URL no proporcionada'}), 400
-    
-    # Validar formato de URL
     try:
-        from urllib.parse import urlparse
-        result = urlparse(url) # https://www.google.com/search?q=python
-        if not all([result.scheme, result.netloc]): # result.scheme -> 'https' / result.netloc -> 'www.google.com' 
+        data = request.json # Traduce la información del json en un diccionario de python
+        url = data.get('url')
+        
+        if not url:
+            return jsonify({'error': 'URL no proporcionada'}), 400
+        
+        # Validar formato de URL
+        try:
+            from urllib.parse import urlparse
+            result = urlparse(url) # https://www.google.com/search?q=python
+            if not all([result.scheme, result.netloc]): # result.scheme -> 'https' / result.netloc -> 'www.google.com' 
+                return jsonify({'error': 'URL inválida'}), 400
+        except:
             return jsonify({'error': 'URL inválida'}), 400
-    except:
-        return jsonify({'error': 'URL inválida'}), 400
-    
-    # Consultar APIs
-    phish_result = check_phish_tank(url)
-    vt_result = check_virustotal(url)
-    
-    if phish_result or vt_result:
-        db.save_analysis(url, True, 10, {
+        
+        # Consultar APIs
+        phish_result = check_phish_tank(url)
+        vt_result = check_virustotal(url)
+        
+        if phish_result or vt_result:
+            db.save_analysis(url, True, 10, {
+                'PhishTank': phish_result,
+                'VirusTotal': vt_result
+            })
+            return jsonify({
+                'url': url,
+                'is_malicious': True,
+                'risk_score': 10,
+                'phish_result': phish_result,
+                'virustotal_result': vt_result
+            })
+        
+        # Análisis heurístico
+        features = extract_features(url)
+        risk_score = calculate_risk_score(features)
+        is_suspicious = classify_by_heuristics(features)
+        
+        # IA EXPLICABLE: Sistema explica sus decisiones
+        # Generar razones heurísticas
+        heuristic_reasons = []
+        
+        if features['domain_age'] == 0:  # No registrado
+            heuristic_reasons.append("Dominio no registrado")
+        elif features['domain_age'] < 30:  # Menos de 1 mes
+            heuristic_reasons.append(f"Dominio muy nuevo ({features['domain_age']} días)")
+        
+        if features['length'] > 75:  # Muy larga
+            heuristic_reasons.append(f"URL muy larga ({features['length']} caracteres)")
+        
+        if features['num_hyphens'] > 3:  # Más de 3 guiones
+            heuristic_reasons.append(f"Demasiados guiones en la URL ({features['num_hyphens']})")
+        
+        if features['has_ip']:  # Usa IP
+            heuristic_reasons.append("Usa dirección IP en lugar de dominio")
+        
+        if not features['is_https']:  # No usa HTTPS
+            heuristic_reasons.append("No usa HTTPS (conexión no segura)")
+        
+        if features['num_equals'] > 3:  # Más de 3 '='
+            heuristic_reasons.append(f"Demasiados parámetros en la URL ({features['num_equals']})")
+        
+        if features['num_at'] > 0:  # Más de 0 '@'
+            heuristic_reasons.append("Contiene caracteres '@' sospechosos")
+            
+        if features['num_dots'] > 5:
+            heuristic_reasons.append(f"Demasiados puntos en la URL ({features['num_dots']})")
+            
+        if features['num_underscore'] > 2:
+            heuristic_reasons.append(f"Demasiados guiones bajos ({features['num_underscore']})")
+     
+        if features['has_port']:
+            heuristic_reasons.append("Usa puerto personalizado")
+     
+        if features['num_slashes'] > 5:
+            heuristic_reasons.append(f"URL con muchas rutas ({features['num_slashes']} barras)")
+            
+        if features['num_queries'] > 3:  
+            heuristic_reasons.append(f"Demasiados parámetros de consulta ({features['num_queries']})")
+            
+        phishing_count = features.get('phishing_keywords_count', 0)
+        if phishing_count >= 3:
+            heuristic_reasons.append(f"Contiene {phishing_count} palabras clave de phishing")
+        elif phishing_count >= 1:
+            heuristic_reasons.append("Contiene palabras típicas de phishing")
+        
+        digits_count = features.get('digits_in_domain', 0)
+        if digits_count >= 3:
+            heuristic_reasons.append(f"Dominio contiene {digits_count} dígitos")
+        elif digits_count >= 1:
+            heuristic_reasons.append("Dominio contiene dígitos")
+        
+        # Guardar en base de datos
+        analysis_results = {
             'PhishTank': phish_result,
-            'VirusTotal': vt_result
-        })
+            'VirusTotal': vt_result,
+            'Heuristic': is_suspicious
+        }
+        
+        db.save_analysis(url, is_suspicious, risk_score, analysis_results)
+        
+        # Obtener edad del dominio
+        domain = extract_domain(url)
+        domain_age = get_domain_age(domain)
+        
         return jsonify({
             'url': url,
-            'is_malicious': True,
-            'risk_score': 10,
+            'is_malicious': is_suspicious,
+            'risk_score': risk_score,
             'phish_result': phish_result,
-            'virustotal_result': vt_result
+            'virustotal_result': vt_result,
+            'features': features,
+            'domain_age': domain_age or 0,
+            'heuristic_reasons': heuristic_reasons
         })
-    
-    # Análisis heurístico
-    features = extract_features(url)
-    risk_score = calculate_risk_score(features)
-    is_suspicious = classify_by_heuristics(features)
-    
-    # IA EXPLICABLE: Sistema explica sus decisiones
-    # Generar razones heurísticas
-    heuristic_reasons = []
-    
-    if features['domain_age'] == 0:  # No registrado
-        heuristic_reasons.append("Dominio no registrado")
-    elif features['domain_age'] < 30:  # Menos de 1 mes
-        heuristic_reasons.append(f"Dominio muy nuevo ({features['domain_age']} días)")
-    
-    if features['length'] > 75:  # Muy larga
-        heuristic_reasons.append(f"URL muy larga ({features['length']} caracteres)")
-    
-    if features['num_hyphens'] > 3:  # Más de 3 guiones
-        heuristic_reasons.append(f"Demasiados guiones en la URL ({features['num_hyphens']})")
-    
-    if features['has_ip']:  # Usa IP
-        heuristic_reasons.append("Usa dirección IP en lugar de dominio")
-    
-    if not features['is_https']:  # No usa HTTPS
-        heuristic_reasons.append("No usa HTTPS (conexión no segura)")
-    
-    if features['num_equals'] > 3:  # Más de 3 '='
-        heuristic_reasons.append(f"Demasiados parámetros en la URL ({features['num_equals']})")
-    
-    if features['num_at'] > 0:  # Más de 0 '@'
-        heuristic_reasons.append("Contiene caracteres '@' sospechosos")
-        
-    if features['num_dots'] > 5:
-        heuristic_reasons.append(f"Demasiados puntos en la URL ({features['num_dots']})")
-        
-    if features['num_underscore'] > 2:
-        heuristic_reasons.append(f"Demasiados guiones bajos ({features['num_underscore']})")
-
-    if features['has_port']:
-        heuristic_reasons.append("Usa puerto personalizado")
-
-    if features['num_slashes'] > 5:
-        heuristic_reasons.append(f"URL con muchas rutas ({features['num_slashes']} barras)")
-        
-    if features['num_queries'] > 3:  
-        heuristic_reasons.append(f"Demasiados parámetros de consulta ({features['num_queries']})")
-        
-    phishing_count = features.get('phishing_keywords_count', 0)
-    if phishing_count >= 3:
-        heuristic_reasons.append(f"Contiene {phishing_count} palabras clave de phishing")
-    elif phishing_count >= 1:
-        heuristic_reasons.append("Contiene palabras típicas de phishing")
-    
-    digits_count = features.get('digits_in_domain', 0)
-    if digits_count >= 3:
-        heuristic_reasons.append(f"Dominio contiene {digits_count} dígitos")
-    elif digits_count >= 1:
-        heuristic_reasons.append("Dominio contiene dígitos")
-    
-    # Guardar en base de datos
-    analysis_results = {
-        'PhishTank': phish_result,
-        'VirusTotal': vt_result,
-        'Heuristic': is_suspicious
-    }
-    
-    db.save_analysis(url, is_suspicious, risk_score, analysis_results)
-    
-    # Obtener edad del dominio
-    domain = extract_domain(url)
-    domain_age = get_domain_age(domain)
-    
-    return jsonify({
-        'url': url,
-        'is_malicious': is_suspicious,
-        'risk_score': risk_score,
-        'phish_result': phish_result,
-        'virustotal_result': vt_result,
-        'features': features,
-        'domain_age': domain_age or 0,
-        'heuristic_reasons': heuristic_reasons
-    })
+    except Exception as e:
+        print(f"❌ Error interno en /analyze: {e}")
+        return jsonify({'error': f'Error interno del servidor: {str(e)}'}), 500
 
 # NUEVA RUTA: Obtener historial de una URL
 @app.route('/api/url-history', methods=['POST'])
