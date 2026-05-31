@@ -226,6 +226,11 @@ class URLDatabase:
 # Inicializar base de datos
 db = URLDatabase()
 
+# Obtener la clase de excepción PywhoisError de forma robusta (evita conflictos de paquetes whois vs python-whois)
+PywhoisError = getattr(whois.parser, 'PywhoisError', None) if hasattr(whois, 'parser') else None
+if PywhoisError is None:
+    PywhoisError = getattr(whois, 'PywhoisError', Exception)
+
 def get_domain_age(domain):
     """
     Obtiene la edad del dominio en días usando WHOIS
@@ -254,7 +259,7 @@ def get_domain_age(domain):
             return max(age_days, 0)
         return 0
         
-    except whois.parser.PywhoisError as e:
+    except PywhoisError as e:
         if "No match" in str(e):
             print(f"⚠️  Dominio {domain} no encontrado en WHOIS")
             return 0
